@@ -1,0 +1,19 @@
+@import url('https://fonts.googleapis.com/css?family=Poppins');
+html{
+    font-family: 'Poppins';
+    font-size: 2.5rem;
+    background-color: black;
+}
+body{
+    min-height: 100vh;
+    background-color: #0000;
+    color: #01fabc;
+    display: grid;
+    position: relative;
+    text-align: center;
+}
+.af{
+    margin-top: -5%;
+    color: white;
+    font-size: 40px;
+}
