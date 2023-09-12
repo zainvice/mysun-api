@@ -5,13 +5,14 @@ const whitelistUrls = [
 ];
 
 const corsOptions = {
-  origin: (origin, callback) => {
-    if (whitelistUrls.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed"));
-    }
-  },
+  // origin: (origin, callback) => {
+  //   if (whitelistUrls.indexOf(origin) !== -1) {
+  //     callback(null, true);
+  //   } else {
+  //     callback(new Error("Not allowed"));
+  //   }
+  // },
+  origin: '*',
   methods: ["GET", "PUT", "POST", "DELETE", "UPDATE", "PATCH"],
   credentials: true,
   optionsSucessStatus: 200,
