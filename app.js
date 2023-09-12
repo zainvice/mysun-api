@@ -9,6 +9,7 @@ const morgan = require('morgan')
 const error = require('./error')
 const cors = require("cors");
 const app = express();
+const authRoutes = require('./routes/authRoutes.js')
 
 //Database Connection
 config.dbConnect()
@@ -17,6 +18,7 @@ config.dbConnect()
 app.use([morgan('short'), cookieParser(), bodyParser.json(), cors(config.corsOptions), middleware.logger]);
 app.use([routes.adminRoutes]);
 app.use([error.handler])
+app.use('/api/v1/auth', authRoutes)
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
