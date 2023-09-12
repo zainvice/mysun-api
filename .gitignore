@@ -1,4 +1,4 @@
 #folder
 node_modules
-**/app.log
+logs/*
 .env
