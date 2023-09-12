@@ -1,15 +1,20 @@
- const allowedOrigins = require ('./allowedOrgins')
+const whitelistUrls = [
+  "http://localhost:3500",
+  "http://localhost:3000",
+  "http://localhost:3001",
+];
 
- const corsOptions ={
-    origin: (origin, callback) =>{
-        if(allowedOrigins.indexOf(origin) !== -1|| !origin){
-            callback(null, true)
-        }else{
-            callback(new Error('Not allowed'))
-        }
-    },
-    credentials: true,
-    optionsSucessStatus: 200
- }
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (whitelistUrls.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed"));
+    }
+  },
+  methods: ["GET", "PUT", "POST", "DELETE", "UPDATE", "PATCH"],
+  credentials: true,
+  optionsSucessStatus: 200,
+};
 
- module.exports =corsOptions
+module.exports = corsOptions;
