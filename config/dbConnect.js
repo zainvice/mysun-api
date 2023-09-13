@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const connectDB = () => {
   mongoose
     .connect(process.env.DATABASE_URI, {
+      dbName: 'mysun',
       useNewUrlParser: true,
       useUnifiedTopology: true,
       autoIndex: true,

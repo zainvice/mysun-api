@@ -1,5 +1,5 @@
 const expressAsyncHandler = require("express-async-handler");
-const Role = require("../models/permision");
+const Role = require("../models/roles");
 const { errors } = require("../error");
 
 const createWorker = expressAsyncHandler(async (req, res, next) => {
