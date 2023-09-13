@@ -2,7 +2,7 @@
   "name": "mysun-api",
   "version": "1.0.0",
   "description": "**THIS IS THE APP BACKEND**",
-  "main": "app.js",
+  "main": "server.js",
   "scripts": {
     "start": "node app",
     "dev": "nodemon app"
