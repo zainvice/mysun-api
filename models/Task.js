@@ -12,6 +12,9 @@ const TaskAssignedSchema = new mongoose.Schema({
   status:{
     type: String,
     default:"Pending",
+  },
+  worker: {
+    type: Object
   }
   
 });
