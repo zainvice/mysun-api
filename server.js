@@ -36,7 +36,7 @@ app.use('/', require('./routes/root'))
 
 app.use('/api/v1/users', require('./routes/userRoutes'))
 app.use('/api/v1/tasks', require('./routes/taskRoutes'))
-
+app.use('/api/v1/projects', require('./routes/projectRoutes'))
 
 app.use(errorHandler)
 

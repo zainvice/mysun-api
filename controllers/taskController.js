@@ -1,5 +1,5 @@
 const TaskAssigned = require('../models/Task');
-
+const asyncHandler= require('express-async-handler')
 // Create a new task assignment
 const createTaskAssignment = async (req, res) => {
   try {
@@ -72,7 +72,6 @@ const deleteTaskAssignmentById = async (req, res) => {
 module.exports={
     getAllTaskAssignments,
     createTaskAssignment,
-    getTaskAssignmentById,
     updateTaskAssignmentById,
     deleteTaskAssignmentById,
     
