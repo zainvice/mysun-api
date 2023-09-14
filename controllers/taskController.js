@@ -19,33 +19,16 @@ const createTaskAssignment = async (req, res) => {
 };
 
 // Get all task assignments
-const getAllTaskAssignments = async (req, res) => {
-  try {
-    const taskAssignments = await TaskAssigned.find();
-    console.log(taskAssignments)
-    res.status(200).json(taskAssignments);
-  } catch (error) {
-    res.status(500).json({ error: 'Error fetching task assignments' });
-  }
-};
 
-// Get a single task assignment by ID
-const getTaskAssignmentById = async (req, res) => {
-  try {
-    console.log('Task assignment before')
-    const taskId = req.params.id;
-    console.log(taskId);
-    const taskAssignment = await TaskAssigned.findById(taskId);
-    
-    if (!taskAssignment) {
-      return res.status(404).json({ error: 'Task assignment not found' });
-    }
-
-    res.status(200).json(taskAssignment);
-  } catch (error) {
-    res.status(500).json({ error: 'Error fetching task assignment' });
+const getAllTaskAssignments = asyncHandler(async (req, res) =>{
+  const tasks = await TaskAssigned.find().lean()
+  if(!tasks?.length){
+      return res.status(400).json({message: 'No tasks found'})
   }
-};
+  res.json(tasks)
+})
+
+
 
 // Update a task assignment by ID
 const updateTaskAssignmentById = async (req, res) => {

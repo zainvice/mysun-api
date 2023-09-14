@@ -21,7 +21,7 @@ const sendEmail = async (email, subject, payload, template) => {
   
     const options = () => {
       return {
-        from: `"Alphabet Factory IncⓇ" <${process.env.FROM_EMAIL}>`,
+        from: `"My Sun IncⓇ" <${process.env.FROM_EMAIL}>`,
         to: email,
         subject: subject,
         html: compiledTemplate(payload),
