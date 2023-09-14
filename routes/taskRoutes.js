@@ -4,7 +4,7 @@ const taskController = require('../controllers/taskController')
 
 
 router.route('/')
-    .get(taskController.getTaskAssignmentById) //READ
+    
     .get(taskController.getAllTaskAssignments) //READ
     .post(taskController.createTaskAssignment) //CREATE
     .patch(taskController.updateTaskAssignmentById) //UPDATE
