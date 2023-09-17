@@ -34,6 +34,18 @@ const createProject = async (req, res) => {
   
       const savedProject = await newProject.save();
       res.status(201).json(savedProject);
+      if(savedProject){
+       
+        sendEmail(
+            savedProject.reciever.email,
+            "New Project Assigned",
+            {
+              name: savedProject.reciever.name,
+              
+            },
+            "./template/newProject.handlebars"
+          );
+    }
     } catch (error) {
       res.status(500).json({ error: "Error creating Project" });
     }
@@ -96,6 +108,18 @@ const updateProject = asyncHandler(async (req, res) => {
       
       console.log("updated project")
       console.log(updatedProject);
+      if(updatedProject){
+       
+        sendEmail(
+            updatedProject.sender.email,
+            "Update in Projeect",
+            {
+              name: updatedProject.sender.name,
+              
+            },
+            "./template/project.handlebars"
+          );
+    }
   
       return res.status(200).json({ message: `${updatedProject.projectName} updated!`, updatedProject });
     } catch (error) {
