@@ -34,7 +34,7 @@ const login = asyncHandler( async(req, res) => {
                     "email": foundUser.email,
                     "fullName": foundUser.fullName,
                     "role": foundUser.role,
-                    "proposals_found": foundUser.proposals
+                    
                 }
             
             },
