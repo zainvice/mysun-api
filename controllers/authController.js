@@ -13,8 +13,7 @@ const login = asyncHandler( async(req, res) => {
         return res.status(400).json({ message: 'All fields are required'})
     }
     
-    const foundUser = undefined
-
+    const foundUser = await User.findOne({email}).lean().exec()
     
     if(!foundUser){
         return res.status(401).json({ message: 'Unauthorized' })
