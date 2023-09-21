@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        default: "user"
+        default: "Worker"
     },
     active: {
         type: Boolean,
@@ -38,7 +38,15 @@ const userSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId,
             ref: "Projects"
         }
+    ],
+    permissions: [{
+        type: String,
+    }
+
     ]
+
+    
+
 
 },
 {

@@ -18,7 +18,7 @@ const getAllUsers = asyncHandler(async (req, res) =>{
 // @access Private
 
 const createNewUser = asyncHandler(async (req, res) =>{
-        const{email, fullName ,phone, password, role}= req.body
+        const{email, fullName ,phone, password, role, permissions}= req.body
 
         //Confirm data 
         if (!email|| !password || !phone){
@@ -38,7 +38,7 @@ const createNewUser = asyncHandler(async (req, res) =>{
 
         const hashedPwd = await bcrypt.hash(password, 10)
 
-        const userObject ={ email, fullName ,phone, "password": hashedPwd, role}
+        const userObject ={ email, fullName ,phone, "password": hashedPwd, role, permissions}
 
         // Create a store new user
 
@@ -65,7 +65,7 @@ const createNewUser = asyncHandler(async (req, res) =>{
 // @access Private
 
 const updateUser = asyncHandler(async (req, res) =>{
-    const {email, phone, role, password, active}= req.body
+    const {email, phone, role, password, active, permissions}= req.body
     console.log('I\'m here')
     //Confirm Data
     if(!email&&!phone){
@@ -107,6 +107,10 @@ const updateUser = asyncHandler(async (req, res) =>{
     if(password){
         //Hash Password
         user.password = await bcrypt.hash(password, 10)
+    }
+    if(permissions){
+        //Hash Password
+        user.permissions = permissions
     }
     const updatedUser= await user.save()
     
