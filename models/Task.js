@@ -15,6 +15,9 @@ const TaskAssignedSchema = new mongoose.Schema({
   },
   worker: {
     type: Object
+  },
+  supervisor:{
+    type: Object
   }
   
 });

@@ -23,14 +23,14 @@ const projectSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
-    sender: {
+    admin: {
       type: String,
       required: false,
     },
-    reciever: {
+    workers: [{
       type: String,
-      default: "User",
-    },
+      default: "Worker",
+    }],
     status: {
       type: String,
       default: "Pending",

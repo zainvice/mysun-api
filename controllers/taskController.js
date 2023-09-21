@@ -9,6 +9,8 @@ const createTaskAssignment = async (req, res) => {
       taskData,
       notes,
       status,
+      worker,
+      supervisor
     });
 
     const savedTaskAssignment = await newTaskAssignment.save();

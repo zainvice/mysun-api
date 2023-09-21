@@ -1,4 +1,4 @@
-const Project = require("../models/proposal");
+const Project = require("../models/project");
 const asyncHandler = require("express-async-handler");
 
 const createProject = async (req, res) => {
@@ -9,8 +9,8 @@ const createProject = async (req, res) => {
         projectData,
         startDate,
         endDate,
-        sender,
-        reciever,
+        admin,
+        workers,
         status,
       } = req.body;
   
@@ -27,8 +27,8 @@ const createProject = async (req, res) => {
         projectData,
         startDate,
         endDate,
-        sender,
-        reciever,
+        admin,
+        workers,
         status,
       });
   
@@ -90,11 +90,11 @@ const updateProject = asyncHandler(async (req, res) => {
       if (updatedData.endDate) {
         project.endDate = updatedData.endDate;
       }
-      if (updatedData.sender) {
-        project.sender = updatedData.sender;
+      if (updatedData.admin) {
+        project.admin = updatedData.admin;
       }
-      if (updatedData.reciever) {
-        project.reciever = updatedData.reciever;
+      if (updatedData.workers) {
+        project.workers = updatedData.workers;
       }
       if (updatedData.status) {
         project.status = updatedData.status;
