@@ -43,7 +43,10 @@ const userSchema = new mongoose.Schema({
         type: String,
     }
 
-    ]
+    ],
+    userData:{
+        type: Object,
+    }
 
     
 
