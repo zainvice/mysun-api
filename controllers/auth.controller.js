@@ -46,6 +46,11 @@ const resetPasswordRequestController = async (req, res, next) => {
 const resetPasswordController = async (req, res, next) => {
   const {userId, token, password} = req.body
   console.log(userId, token, password)
+
+  if(!userId||!token) {
+    return res.status(400).json({message: 'Missing User ID or token'})
+  }
+
   const passwordResetToken = await Token.findOne({ userId });
 
   if (!passwordResetToken&&!userId) {
