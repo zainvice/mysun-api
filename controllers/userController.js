@@ -18,7 +18,7 @@ const getAllUsers = asyncHandler(async (req, res) =>{
 // @access Private
 
 const createNewUser = asyncHandler(async (req, res) =>{
-        const{email, fullName ,phone, password, role, permissions}= req.body
+        const{email, fullName ,username ,phone, password, role, permissions}= req.body
 
         //Confirm data 
         if (!email|| !password || !phone){
@@ -38,7 +38,7 @@ const createNewUser = asyncHandler(async (req, res) =>{
 
         const hashedPwd = await bcrypt.hash(password, 10)
 
-        const userObject ={ email, fullName ,phone, "password": hashedPwd, role, permissions}
+        const userObject ={ email, fullName ,phone, username, "password": hashedPwd, role, permissions}
 
         // Create a store new user
 
