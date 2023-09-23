@@ -28,7 +28,7 @@ const projectSchema = new mongoose.Schema(
       required: false,
     },
     workers: [{
-      type: String,
+      type: Object,
       default: "Worker",
     }],
     status: {
