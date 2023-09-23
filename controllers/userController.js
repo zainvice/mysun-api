@@ -65,7 +65,7 @@ const createNewUser = asyncHandler(async (req, res) =>{
 // @access Private
 
 const updateUser = asyncHandler(async (req, res) =>{
-    const {email, phone, role, password, active, permissions}= req.body
+    const {email, phone, role, password, active, permissions, username}= req.body
     console.log('I\'m here')
     //Confirm Data
     if(!email&&!phone){
@@ -99,6 +99,9 @@ const updateUser = asyncHandler(async (req, res) =>{
     }
     if (phone){
         user.phone=phone
+    }
+    if (username){
+        user.username=username
     }
 
     if(active||active!=undefined){

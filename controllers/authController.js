@@ -12,8 +12,14 @@ const login = asyncHandler( async(req, res) => {
     if(!email||!password){
         return res.status(400).json({ message: 'All fields are required'})
     }
-    
-    const foundUser = await User.findOne({email}).lean().exec()
+    let foundUser
+    if (email && email.includes('@')) {
+        foundUser = await User.findOne({email}).lean().exec()
+    } else {
+       const username = email
+        foundUser = await User.findOne({username}).lean().exec()
+    }
+   
     
     if(!foundUser){
         return res.status(401).json({ message: 'Unauthorized' })
@@ -92,6 +98,7 @@ const refresh =(req, res) =>{
                     {
                         "UserInfo":{
                             "email": foundUser.email,
+                            "fullName": foundUser.fullName,
                             "role": foundUser.role
                         }
                     },
