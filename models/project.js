@@ -15,6 +15,10 @@ const projectSchema = new mongoose.Schema(
       type: Object,
       required: false,
     },
+    projectDescription: {
+        type:String,
+        required: false
+    },
     startDate: {
       type: Date,
       required: true,

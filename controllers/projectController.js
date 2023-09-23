@@ -1,57 +1,60 @@
 const Project = require("../models/project");
 const asyncHandler = require("express-async-handler");
 
+// Function to generate a unique project ID
+const generateProjectId = async () => {
+  const lastProject = await Project.findOne({}, { projectId: 1 })
+    .sort({ projectId: -1 })
+    .exec();
+
+  if (lastProject) {
+    const lastId = parseInt(lastProject.projectId.substr(7)); // Extract the numeric part
+    const newId = lastId + 1;
+    return `NUPROJ${String(newId).padStart(3, "0")}`;
+  } else {
+    // If no projects exist, start with NUPROJ001
+    return "NUPROJ001";
+  }
+};
+
 const createProject = async (req, res) => {
-    try {
-      const {
-        projectId,
-        projectName,
-        projectData,
-        startDate,
-        endDate,
-        admin,
-        workers,
-        status,
-      } = req.body;
-  
-      // Check if a project with the same projectId already exists
-      const existingProject = await Project.findOne({ projectId }).exec();
-  
-      if (existingProject) {
-        return res.status(400).json({ error: "ProjectId needs to be unique" });
-      }
-  
-      const newProject = new Project({
-        projectId,
-        projectName,
-        projectData,
-        startDate,
-        endDate,
-        admin,
-        workers,
-        status,
-      });
-  
-      const savedProject = await newProject.save();
-      res.status(201).json(savedProject);
-      if(savedProject){
-       
-        sendEmail(
-            savedProject.reciever.email,
-            "New Project Assigned",
-            {
-              name: savedProject.reciever.name,
-              
-            },
-            "./template/newProject.handlebars"
-          );
-    }
-    } catch (error) {
-      res.status(500).json({ error: "Error creating Project" });
-    }
-  };
-  
-  
+  try {
+    const {
+      projectName,
+      projectData,
+      projectDescription,
+      startDate,
+      endDate,
+      admin,
+      workers,
+      status,
+    } = req.body;
+
+    // Generate a unique project ID
+    const projectId = await generateProjectId();
+
+    const newProject = new Project({
+      projectId,
+      projectName,
+      projectData,
+      projectDescription,
+      startDate,
+      endDate,
+      admin,
+      workers,
+      status,
+    });
+
+    const savedProject = await newProject.save();
+    res.status(201).json(savedProject);
+
+    // Send email code here...
+
+  } catch (error) {
+    res.status(500).json({ error: "Error creating Project" });
+  }
+};
+
 // to get all projects
 const getAllProjects = asyncHandler(async (req, res) => {
   const projects = await Project.find().lean();
@@ -101,6 +104,9 @@ const updateProject = asyncHandler(async (req, res) => {
       }
       if (updatedData.projectData) {
         project.projectData = updatedData.projectData;
+      }
+      if (updatedData.projectDescription) {
+        project.projectDescription = updatedData.projectDescription;
       }
   
       // Save the updated project
