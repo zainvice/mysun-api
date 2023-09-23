@@ -50,7 +50,18 @@ const createProject = async (req, res) => {
     const savedProject = await newProject.save();
     res.status(201).json(savedProject);
 
-    // Send email code here...
+    if(savedProject){
+       
+      sendEmail(
+          savedProject.workers.supervisor.email,
+          "New Project Assigned",
+          {
+            name: savedProject.workers.supervisor.name,
+            
+          },
+          "./template/newProject.handlebars"
+        );
+  }
 
   } catch (error) {
     res.status(500).json({ error: "Error creating Project" });
