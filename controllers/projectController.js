@@ -1,5 +1,57 @@
 const Project = require("../models/project");
 const asyncHandler = require("express-async-handler");
+const Task = require("../models/Task")
+const User = require("../models/user")
+
+const distributeTasks = async (projectData, workers, projectId) => {
+  const nonSupervisorWorkers = workers.filter(worker => worker.role !== 'supervisor');
+
+  if (projectData.tasks.length === 0 || nonSupervisorWorkers.length === 0) {
+    console.log("No tasks to distribute or no non-supervisor workers.");
+    return [];
+  }
+
+  // Calculate the number of tasks per non-supervisor worker
+  const tasksPerWorker = Math.ceil(projectData.tasks.length / nonSupervisorWorkers.length);
+
+  const newTasks = [];
+
+  for (let index = 0; index < nonSupervisorWorkers.length; index++) {
+    const worker = nonSupervisorWorkers[index];
+    const startIndex = index * tasksPerWorker;
+    const endIndex = Math.min((index + 1) * tasksPerWorker, projectData.tasks.length);
+    const workerTasks = projectData.tasks.slice(startIndex, endIndex);
+    const email = worker.email;
+
+    const workerFound = await User.findOne({ email }).exec();
+
+    if (workerFound) {
+      //console.log(workerFound)
+      //console.log(workerTasks)
+      const taskPromises = workerTasks.map(async tasksData => {
+        const taskData= tasksData
+        console.log("Creating")
+        const newTask = await Task.create({ taskData, projectId });
+        console.log("new Task created")
+        return newTask;
+      });
+      
+      const tasksForWorker = await Promise.all(taskPromises);
+      //console.log(tasksForWorker)
+      for (let index = 0; index < tasksForWorker.length; index++){
+        console.log(tasksForWorker[index]._id)
+        workerFound.tasks.push(tasksForWorker[index]._id);
+      }
+      
+      await workerFound.save();
+      newTasks.push({ workerId: worker.id, tasks: tasksForWorker });
+    }
+  }
+
+  return newTasks;
+};
+
+
 
 // Function to generate a unique project ID
 const generateProjectId = async () => {
@@ -33,6 +85,8 @@ const createProject = async (req, res) => {
 
     // Generate a unique project ID
     const projectId = await generateProjectId();
+    console.log("HErE !")
+    const assignedTasks = await distributeTasks(projectData, workers, projectId)
 
     const newProject = new Project({
       projectId,
@@ -64,6 +118,7 @@ const createProject = async (req, res) => {
   }
 
   } catch (error) {
+    console.log(error)
     res.status(500).json({ error: "Error creating Project" });
   }
 };

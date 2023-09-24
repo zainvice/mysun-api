@@ -1,10 +1,13 @@
 const mongoose = require('mongoose');
 
-const TaskAssignedSchema = new mongoose.Schema({
+const Task = new mongoose.Schema({
   taskData: {
     type: Object,
     required: true,
    
+  },
+  projectId: {
+    type: String,
   },
   notes: {
     type: String,
@@ -22,4 +25,4 @@ const TaskAssignedSchema = new mongoose.Schema({
   
 });
 
-module.exports = mongoose.model('TaskAssigned', TaskAssignedSchema);
+module.exports = mongoose.model('Task', Task);

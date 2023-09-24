@@ -51,9 +51,8 @@ const userSchema = new mongoose.Schema({
     ],
     userData:{
         type: Object,
-    }
-
-    
+    },
+    tasks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
 
 
 },
