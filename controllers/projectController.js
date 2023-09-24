@@ -52,7 +52,7 @@ const createProject = async (req, res) => {
 
     if(savedProject){
        
-      sendEmail(
+     /*  sendEmail(
           savedProject.workers.supervisor.email,
           "New Project Assigned",
           {
@@ -60,7 +60,7 @@ const createProject = async (req, res) => {
             
           },
           "./template/newProject.handlebars"
-        );
+        ); */
   }
 
   } catch (error) {
@@ -70,7 +70,7 @@ const createProject = async (req, res) => {
 
 // to get all projects
 const getAllProjects = asyncHandler(async (req, res) => {
-  const projects = await Project.find().lean();
+  const projects = await Project.find().sort({ createdAt: -1 }).lean();
   if (!projects?.length) {
     return res.status(400).json({ message: "No Project found" });
   }
