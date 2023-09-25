@@ -40,6 +40,7 @@ const login = asyncHandler( async(req, res) => {
                     "email": foundUser.email,
                     "fullName": foundUser.fullName,
                     "role": foundUser.role,
+                    "tasks": foundUser.tasks,
                     
                 }
             
@@ -49,7 +50,9 @@ const login = asyncHandler( async(req, res) => {
         )
     
         const refershToken = jwt.sign(
-            {"email": foundUser.email},
+            {"email": foundUser.email,
+            "tasks": foundUser.tasks, 
+        },
             process.env.REFRESH_TOKEN_SECRET,
             { expiresIn: '2hr'}
         )
