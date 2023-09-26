@@ -36,11 +36,11 @@ const getAllTaskAssignments = asyncHandler(async (req, res) =>{
 const updateTaskAssignmentById = async (req, res) => {
   try {
     const taskId = req.params.id;
-    const { taskData, notes, status } = req.body;
+    const { taskData, notes, status, timeTaken } = req.body;
 
     const updatedTaskAssignment = await TaskAssigned.findByIdAndUpdate(
       taskId,
-      { taskData, notes, status },
+      { taskData, notes, status, timeTaken },
       { new: true }
     );
 

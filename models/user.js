@@ -47,8 +47,11 @@ const userSchema = new mongoose.Schema({
     permissions: [{
         type: String,
     }
-
+    
     ],
+    notes: {
+        type: String,
+    },
     userData:{
         type: Object,
     },

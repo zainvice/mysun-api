@@ -22,6 +22,9 @@ const Task = new mongoose.Schema({
   },
   supervisor:{
     type: Object
+  },
+  timeTaken:{
+    
   }
   
 });

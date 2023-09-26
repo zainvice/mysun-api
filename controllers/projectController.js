@@ -35,7 +35,7 @@ const distributeTasks = async (projectData, workers, projectId) => {
       const taskPromises = workerTasks.map(async tasksData => {
         const taskData= tasksData
         console.log("Creating")
-        const newTask = await Task.create({ taskData, projectId });
+        const newTask = await Task.create({ taskData, projectId, supervisor: superviosrFound, worker: workerFound });
         console.log("new Task created")
         return newTask;
       });

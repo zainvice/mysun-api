@@ -65,10 +65,10 @@ const createNewUser = asyncHandler(async (req, res) =>{
 // @access Private
 
 const updateUser = asyncHandler(async (req, res) =>{
-    const {email, phone, role, password, active, permissions, username}= req.body
-    console.log('I\'m here')
+    const {email, phone, role, password, active, permissions, username, notes}= req.body
+
     //Confirm Data
-    if(!email&&!phone){
+    if(!email){
         return res.status(400).json({message: 'Email required!'})
     }
     let user
@@ -115,12 +115,15 @@ const updateUser = asyncHandler(async (req, res) =>{
         //Hash Password
         user.permissions = permissions
     }
+    if(notes){
+        user.notes= notes
+    }
     const updatedUser= await user.save()
     
     console.log(updatedUser)
 
     res.json({message: `${updatedUser.email} updated!`})
-    console.log('I\'m 1 here')
+    
 })
 
 // @des delete USER

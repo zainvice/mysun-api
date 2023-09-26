@@ -48,6 +48,7 @@ const login = asyncHandler( async(req, res) => {
                     "fullName": foundUser.fullName,
                     "role": foundUser.role,
                     "tasks": foundUser.tasks,
+                    "notes": foundUser.notes,
                     
                 }
             
