@@ -28,7 +28,7 @@ const distributeTasks = async (projectData, workers, projectId) => {
     const workerFound = await User.findOne({ email }).exec();
     const semail = SupervisorWorkers[0].email
     const superviosrFound = await User.findOne({email: semail}).exec()
-    
+    const project = await Project.findById({_id: projectId});
     if (workerFound) {
       //console.log(workerFound)
       //console.log(workerTasks)
@@ -36,6 +36,9 @@ const distributeTasks = async (projectData, workers, projectId) => {
         const taskData= tasksData
         console.log("Creating")
         const newTask = await Task.create({ taskData, projectId, supervisor: superviosrFound, worker: workerFound });
+        if(project){
+          project.tasks.push(newTask)
+        }
         console.log("new Task created")
         return newTask;
       });
@@ -51,6 +54,7 @@ const distributeTasks = async (projectData, workers, projectId) => {
       await superviosrFound.save();
       workerFound.projects.push(projectId)
       await workerFound.save();
+      await project.save()
       newTasks.push({ workerId: worker.id, tasks: tasksForWorker });
     }
   }
