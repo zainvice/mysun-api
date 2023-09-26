@@ -7,7 +7,8 @@ const Task = new mongoose.Schema({
    
   },
   projectId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Project"
   },
   notes: {
     type: String,

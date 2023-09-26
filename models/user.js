@@ -41,7 +41,7 @@ const userSchema = new mongoose.Schema({
     projects: [
         {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "Projects"
+            ref: "Project"
         }
     ],
     permissions: [{
@@ -53,6 +53,9 @@ const userSchema = new mongoose.Schema({
         type: Object,
     },
     tasks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
+    lastLogin: {
+       
+    }
 
 
 },

@@ -5,6 +5,8 @@ const User = require("../models/user")
 
 const distributeTasks = async (projectData, workers, projectId) => {
   const nonSupervisorWorkers = workers.filter(worker => worker.role !== 'supervisor');
+  const SupervisorWorkers = workers.filter(worker => worker.role === 'supervisor');
+  console.log(SupervisorWorkers)
 
   if (projectData.tasks.length === 0 || nonSupervisorWorkers.length === 0) {
     console.log("No tasks to distribute or no non-supervisor workers.");
@@ -24,7 +26,9 @@ const distributeTasks = async (projectData, workers, projectId) => {
     const email = worker.email;
 
     const workerFound = await User.findOne({ email }).exec();
-
+    const semail = SupervisorWorkers[0].email
+    const superviosrFound = await User.findOne({email: semail}).exec()
+    
     if (workerFound) {
       //console.log(workerFound)
       //console.log(workerTasks)
@@ -41,8 +45,11 @@ const distributeTasks = async (projectData, workers, projectId) => {
       for (let index = 0; index < tasksForWorker.length; index++){
         console.log(tasksForWorker[index]._id)
         workerFound.tasks.push(tasksForWorker[index]._id);
+        
       }
-      
+      superviosrFound.projects.push(projectId)
+      await superviosrFound.save();
+      workerFound.projects.push(projectId)
       await workerFound.save();
       newTasks.push({ workerId: worker.id, tasks: tasksForWorker });
     }
@@ -86,7 +93,7 @@ const createProject = async (req, res) => {
     // Generate a unique project ID
     const projectId = await generateProjectId();
     console.log("HErE !")
-    const assignedTasks = await distributeTasks(projectData, workers, projectId)
+    
 
     const newProject = new Project({
       projectId,
@@ -100,10 +107,10 @@ const createProject = async (req, res) => {
       workers,
       status,
     });
-
+    
     const savedProject = await newProject.save();
     res.status(201).json(savedProject);
-
+    const assignedTasks = await distributeTasks(projectData, workers, savedProject._id)
     if(savedProject){
        
      /*  sendEmail(

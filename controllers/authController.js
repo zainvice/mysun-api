@@ -8,7 +8,7 @@ const asyncHandler = require('express-async-handler')
 // @ access public
 const login = asyncHandler( async(req, res) => {
     const{ username, password, email } = req.body
-    console.log(email, password)
+    const timestamp = Date.now()
     if(!email||!password){
         return res.status(400).json({ message: 'All fields are required'})
     }
@@ -25,6 +25,13 @@ const login = asyncHandler( async(req, res) => {
         return res.status(401).json({ message: 'Unauthorized' })
 
     }
+    if(foundUser){
+        foundUser.lastLogin= timestamp
+        const updatedUser= await User.findByIdAndUpdate(foundUser._id, foundUser)
+        console.log("time updated!")
+
+    }
+    
     if(foundUser){
         if(!foundUser.active)
             return res.status(401).json({ message: 'Unauthorized' })
