@@ -23,7 +23,7 @@ const createTaskAssignment = async (req, res) => {
 // Get all task assignments
 
 const getAllTaskAssignments = asyncHandler(async (req, res) =>{
-  const tasks = await TaskAssigned.find().lean()
+  const tasks = await TaskAssigned.find().populate('projectId').lean()
   if(!tasks?.length){
       return res.status(400).json({message: 'No tasks found'})
   }

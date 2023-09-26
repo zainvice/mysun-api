@@ -43,6 +43,10 @@ const projectSchema = new mongoose.Schema(
       type: String,
       default: "Pending",
     },
+    tasks: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Task"
+    }]
   },
   {
     timestamps: true,

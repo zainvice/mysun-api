@@ -132,7 +132,7 @@ const createProject = async (req, res) => {
 
 // to get all projects
 const getAllProjects = asyncHandler(async (req, res) => {
-  const projects = await Project.find().sort({ createdAt: -1 }).lean();
+  const projects = await Project.find().populate('tasks').sort({ createdAt: -1 }).lean();
   if (!projects?.length) {
     return res.status(400).json({ message: "No Project found" });
   }
