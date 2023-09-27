@@ -22,13 +22,50 @@ const createTaskAssignment = async (req, res) => {
 
 // Get all task assignments
 
-const getAllTaskAssignments = asyncHandler(async (req, res) =>{
-  const tasks = await TaskAssigned.find().populate('projectId').lean()
-  if(!tasks?.length){
-      return res.status(400).json({message: 'No tasks found'})
+const getAllTaskAssignments = asyncHandler(async (req, res) => {
+  const tasks = await TaskAssigned.find().populate('projectId').lean();
+  
+  if (!tasks?.length) {
+    return res.status(400).json({ message: 'No tasks found' });
   }
-  res.json(tasks)
-})
+
+  // Define an object to group tasks by status
+  const tasksByStatus = {
+    'Pending': [],
+    'Coordination Letter 1': [],
+    'Coordination Letter 2': [],
+    'Office Work': [],
+    'Measurement in Assessment': [],
+    'Partly Measured': [],
+    'Missing Information': [],
+    'United Address': [],
+    'Refused Survey': [],
+    'Fixing Required': [],
+    'Examination': [],
+    'Ready for Delivery': [],
+    'Delivered': [],
+  };
+
+  // Categorize tasks by status
+  tasks.forEach((task) => {
+    const { status } = task; // Assuming the status is a property in your task object
+    if (tasksByStatus[status]) {
+      tasksByStatus[status].push(task);
+    }
+  });
+
+  // If there are projects in "Pending" state, move them to the top
+  const tasksWithPending = tasksByStatus['Pending'];
+  delete tasksByStatus['Pending'];
+
+  // Create a new object with pending tasks at the top
+  const sortedTasksByStatus = {
+    'Pending': tasksWithPending,
+    ...tasksByStatus,
+  };
+
+  res.json(sortedTasksByStatus);
+});
 
 
 
