@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        default: "Worker"
+        default: "worker"
     },
     active: {
         type: Boolean,

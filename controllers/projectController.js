@@ -29,6 +29,7 @@ const distributeTasks = async (projectData, workers, projectId) => {
     const semail = SupervisorWorkers[0].email
     const superviosrFound = await User.findOne({email: semail}).exec()
     const project = await Project.findById({_id: projectId});
+    
     if (workerFound) {
       //console.log(workerFound)
       //console.log(workerTasks)
@@ -37,7 +38,7 @@ const distributeTasks = async (projectData, workers, projectId) => {
         console.log("Creating")
         const newTask = await Task.create({ taskData, projectId, supervisor: superviosrFound, worker: workerFound });
         if(project){
-          project.tasks.push(newTask)
+          project.tasks.push(newTask._id)
         }
         console.log("new Task created")
         return newTask;
@@ -46,7 +47,7 @@ const distributeTasks = async (projectData, workers, projectId) => {
       const tasksForWorker = await Promise.all(taskPromises);
       //console.log(tasksForWorker)
       for (let index = 0; index < tasksForWorker.length; index++){
-        console.log(tasksForWorker[index]._id)
+        
         workerFound.tasks.push(tasksForWorker[index]._id);
         
       }

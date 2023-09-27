@@ -7,7 +7,7 @@ const sendEmail = require("../utils/email/sendEmail");
 // @access Private
 
 const getAllUsers = asyncHandler(async (req, res) =>{
-        const users = await User.find().populate('tasks').select('-password').lean()
+        const users = await User.find().populate('tasks').populate('projects').select('-password').lean()
         if(!users?.length){
             return res.status(400).json({message: 'No users found'})
         }
@@ -31,7 +31,7 @@ const createNewUser = asyncHandler(async (req, res) =>{
         const duplicates = await User.findOne({email}).lean().exec()
 
         if(duplicates){
-            return res.status(409).json({message: 'Email already exits! '})
+            return res.status(409).json({message: 'Email already exists! '})
         }
 
         // Hash password 
