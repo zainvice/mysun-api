@@ -1,5 +1,6 @@
 const TaskAssigned = require('../models/Task');
 const asyncHandler= require('express-async-handler')
+const User = require('../models/user')
 // Create a new task assignment
 const createTaskAssignment = async (req, res) => {
   try {
@@ -29,42 +30,31 @@ const getAllTaskAssignments = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: 'No tasks found' });
   }
 
-  // Define an object to group tasks by status
-  const tasksByStatus = {
-    'Pending': [],
-    'Coordination Letter 1': [],
-    'Coordination Letter 2': [],
-    'Office Work': [],
-    'Measurement in Assessment': [],
-    'Partly Measured': [],
-    'Missing Information': [],
-    'United Address': [],
-    'Refused Survey': [],
-    'Fixing Required': [],
-    'Examination': [],
-    'Ready for Delivery': [],
-    'Delivered': [],
-  };
+  // Sort tasks based on status
+  tasks.sort((task1, task2) => {
+    const statusOrder = {
+      'Pending': 1,
+      'Coordination Letter 1': 2,
+      'Coordination Letter 2': 3,
+      'Office Work': 4,
+      'Measurement in Assessment': 5,
+      'Partly Measured': 6,
+      'Missing Information': 7,
+      'United Address': 8,
+      'Refused Survey': 9,
+      'Fixing Required': 10,
+      'Examination': 11,
+      'Ready for Delivery': 12,
+      'Delivered': 13,
+    };
 
-  // Categorize tasks by status
-  tasks.forEach((task) => {
-    const { status } = task; // Assuming the status is a property in your task object
-    if (tasksByStatus[status]) {
-      tasksByStatus[status].push(task);
-    }
+    const status1 = task1.status;
+    const status2 = task2.status;
+
+    return statusOrder[status1] - statusOrder[status2];
   });
 
-  // If there are projects in "Pending" state, move them to the top
-  const tasksWithPending = tasksByStatus['Pending'];
-  delete tasksByStatus['Pending'];
-
-  // Create a new object with pending tasks at the top
-  const sortedTasksByStatus = {
-    'Pending': tasksWithPending,
-    ...tasksByStatus,
-  };
-
-  res.json(sortedTasksByStatus);
+  res.json(tasks);
 });
 
 
@@ -84,7 +74,18 @@ const updateTaskAssignmentById = async (req, res) => {
     if (!updatedTaskAssignment) {
       return res.status(404).json({ error: 'Task assignment not found' });
     }
+    if(updatedTaskAssignment){
+      const email= updatedTaskAssignment.worker.email
+      const worker= await User.findOne({email}).exec()
+      if(worker){
+        worker.workhours= worker.workhours+timeTaken
+        await worker.save()
+        console.log("Worker Updated!")
+      }
 
+
+
+    }
     res.status(200).json(updatedTaskAssignment);
   } catch (error) {
     res.status(500).json({ error: 'Error updating task assignment' });
