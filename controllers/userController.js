@@ -71,14 +71,9 @@ const updateUser = asyncHandler(async (req, res) =>{
     if(!email){
         return res.status(400).json({message: 'Email required!'})
     }
-    let user
-    if(email){
-        user = await User.findOne({email}).exec()
-    }
-    if(phone){
-        user = await User.findOne({phone}).exec()
-    }
-
+    
+    const user = await User.findOne({email}).exec()
+    
     if(!user){
         return res.status(400).json({message: 'User not found!'})
     }
@@ -91,7 +86,7 @@ const updateUser = asyncHandler(async (req, res) =>{
     if (duplicates){
             return res.status(409).json({message: 'Duplicate email'})
     }*/
-    if(email){
+    if(user.email !== email){
         user.email = email
     }
     if(role){
@@ -131,30 +126,33 @@ const updateUser = asyncHandler(async (req, res) =>{
 // @access Private
 
 const deleteUser = asyncHandler(async (req, res) =>{
-    const {email, active}= req.body
-    console.log(email, active)
-    if(!email){
-        return res.status(400).json({message: 'Email Required'})
+    const {_id, active}= req.body
+    if(!_id){
+        return res.status(400).json({message: 'ID Required'})
 
     }
-
+    console.log(_id, active)
     /*const note= await Note.findOne({email}).lean().exec()
 
     if(note){
         return res.status(400).json({message: 'User has assigned tasks'})
     }*/
-    const user = await User.findOne({email}).exec()
+    const user = await User.findById(_id).exec()
 
     if(!user){
         return res.status(400).json({message: 'User not found'})
 
     }
     let result
-    if(active){
+    if(!active&&active===undefined){
         result = await user.deleteOne()
     }
-    if(!active){
-        user.active=active
+    if(active===true){
+        user.active= false
+        result = await User.findByIdAndUpdate(user._id, user)
+    }
+    if(active===false){
+        user.active= true
         result = await User.findByIdAndUpdate(user._id, user)
     }
     console.log(result)

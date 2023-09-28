@@ -61,12 +61,15 @@ const getAllTaskAssignments = asyncHandler(async (req, res) => {
 
 // Update a task assignment by ID
 const updateTaskAssignmentById = async (req, res) => {
-  try {
-    const taskId = req.params.id;
-    const { taskData, notes, status, timeTaken } = req.body;
 
+    const { _id ,taskData, notes, status, timeTaken } = req.body;
+    console.log(req.body)
+    if(!_id){
+      console.log("ID not found abort!")
+      return res.status(400).json({error: 'ID not found'})
+    }
     const updatedTaskAssignment = await TaskAssigned.findByIdAndUpdate(
-      taskId,
+      _id,
       { taskData, notes, status, timeTaken },
       { new: true }
     );
@@ -86,10 +89,13 @@ const updateTaskAssignmentById = async (req, res) => {
 
 
     }
+    if(!updateTaskAssignmentById){
+      res.status(500).json({ error: 'Error updating task assignment' });
+    }
     res.status(200).json(updatedTaskAssignment);
-  } catch (error) {
-    res.status(500).json({ error: 'Error updating task assignment' });
-  }
+  
+    
+  
 };
 
 // Delete a task assignment by ID

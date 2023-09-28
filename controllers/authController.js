@@ -22,15 +22,10 @@ const login = asyncHandler( async(req, res) => {
    
     
     if(!foundUser){
-        return res.status(401).json({ message: 'Unauthorized' })
+        return res.status(401).json({ message: 'Not Registered!' })
 
     }
-    if(foundUser){
-        foundUser.lastLogin= timestamp
-        const updatedUser= await User.findByIdAndUpdate(foundUser._id, foundUser)
-        console.log("time updated!")
-
-    }
+    
     
     if(foundUser){
         if(!foundUser.active)
@@ -49,6 +44,7 @@ const login = asyncHandler( async(req, res) => {
                     "role": foundUser.role,
                     "tasks": foundUser.tasks,
                     "notes": foundUser.notes,
+                
                     
                 }
             
@@ -72,9 +68,14 @@ const login = asyncHandler( async(req, res) => {
             maxAge: 7 * 24 * 60 * 60 * 1000 //cookie expiry: set to match rT
         })
         
-        res.json({ accessToken, Name: foundUser.fullName, Role: foundUser.role })
+        res.json({ accessToken, Name: foundUser.fullName, Role: foundUser.role, lastLogin: foundUser.lastLogin })
     }
-    
+    if(foundUser){
+        foundUser.lastLogin= timestamp
+        const updatedUser= await User.findByIdAndUpdate(foundUser._id, foundUser)
+        console.log("time updated!")
+
+    }
 
 })
 
