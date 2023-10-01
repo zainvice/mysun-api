@@ -149,12 +149,12 @@ const getAllProjects = asyncHandler(async (req, res) => {
 //update project by using projectId
 const updateProject = asyncHandler(async (req, res) => {
     try {
-      const { projectId, updatedData } = req.body;
-      console.log('I\'m here');
-  
+      const { projectId, updatedData, workers } = req.body;
+      
       if (!projectId) {
         return res.status(400).json({ message: 'Project ID is required' });
       }
+     
   
       // Find the project by projectId
       const project = await Project.findOne({ projectId }).exec();
@@ -166,29 +166,33 @@ const updateProject = asyncHandler(async (req, res) => {
       console.log(project);
   
       // update the project fields that u want
-      if (updatedData.projectName) {
-        project.projectName = updatedData.projectName;
+      if (updatedData?.projectName) {
+        project.projectName = updatedData?.projectName;
       }
-      if (updatedData.startDate) {
-        project.startDate = updatedData.startDate;
+      if (updatedData?.startDate) {
+        project.startDate = updatedData?.startDate;
       }
-      if (updatedData.endDate) {
-        project.endDate = updatedData.endDate;
+      if (updatedData?.endDate) {
+        project.endDate = updatedData?.endDate;
       }
-      if (updatedData.admin) {
-        project.admin = updatedData.admin;
+      if (updatedData?.admin) {
+        project.admin = updatedData?.admin;
       }
-      if (updatedData.workers) {
-        project.workers = updatedData.workers;
+      console.log("found Workers", workers)
+      if (workers) {
+       
+        for(const worker of workers){
+          project.workers.push(worker)
+        }
       }
-      if (updatedData.status) {
-        project.status = updatedData.status;
+      if (updatedData?.status) {
+        project.status = updatedData?.status;
       }
-      if (updatedData.projectData) {
-        project.projectData = updatedData.projectData;
+      if (updatedData?.projectData) {
+        project.projectData = updatedData?.projectData;
       }
-      if (updatedData.projectDescription) {
-        project.projectDescription = updatedData.projectDescription;
+      if (updatedData?.projectDescription) {
+        project.projectDescription = updatedData?.projectDescription;
       }
   
       // Save the updated project
@@ -198,7 +202,7 @@ const updateProject = asyncHandler(async (req, res) => {
       console.log(updatedProject);
       if(updatedProject){
        
-        sendEmail(
+        /* sendEmail(
             updatedProject.sender.email,
             "Update in Projeect",
             {
@@ -206,7 +210,7 @@ const updateProject = asyncHandler(async (req, res) => {
               
             },
             "./template/project.handlebars"
-          );
+          ); */
     }
   
       return res.status(200).json({ message: `${updatedProject.projectName} updated!`, updatedProject });
