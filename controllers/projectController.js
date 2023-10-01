@@ -15,7 +15,7 @@ const distributeTasks = async (projectData, workers, projectId) => {
 
   // Calculate the number of tasks per non-supervisor worker
   const tasksPerWorker = Math.ceil(projectData.tasks.length / nonSupervisorWorkers.length);
-
+  let tasknum=0
   const newTasks = [];
 
   for (let index = 0; index < nonSupervisorWorkers.length; index++) {
@@ -36,8 +36,10 @@ const distributeTasks = async (projectData, workers, projectId) => {
       const taskPromises = workerTasks.map(async tasksData => {
         const taskData= tasksData
         console.log("Creating")
+        tasknum=tasknum+1
         const newTask = await Task.create({ taskData, projectId, supervisor: superviosrFound, worker: workerFound });
         if(project){
+          console.log("added task: ", tasknum, newTask._id,"to", project.projectName)
           project.tasks.push(newTask._id)
         }
         console.log("new Task created")
@@ -48,7 +50,7 @@ const distributeTasks = async (projectData, workers, projectId) => {
       //console.log(tasksForWorker)
       for (let index = 0; index < tasksForWorker.length; index++){
         
-        workerFound.tasks.push(tasksForWorker[index]._id);
+        //workerFound.tasks.push(tasksForWorker[index]._id);
         
       }
       superviosrFound.projects.push(projectId)
