@@ -46,6 +46,12 @@ const projectSchema = new mongoose.Schema(
     tasks: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: "Task"
+    }],
+    buildingData: {
+      type: Object
+    },
+    completeData:[{
+      type: Object
     }]
   },
   {

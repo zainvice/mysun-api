@@ -88,6 +88,7 @@ const createProject = async (req, res) => {
     const {
       projectName,
       projectData,
+      buildingData,
       projectDescription,
       projectFile,
       startDate,
@@ -99,13 +100,13 @@ const createProject = async (req, res) => {
 
     // Generate a unique project ID
     const projectId = await generateProjectId();
-    console.log("HErE !")
     
 
     const newProject = new Project({
       projectId,
       projectName,
       projectData,
+      buildingData,
       projectDescription,
       projectFile,
       startDate,
@@ -149,13 +150,12 @@ const getAllProjects = asyncHandler(async (req, res) => {
 //update project by using projectId
 const updateProject = asyncHandler(async (req, res) => {
     try {
-      const { projectId, updatedData, workers } = req.body;
-      
+      const { projectId, updatedData, workers, taskData, buildingData } = req.body;
+      console.log(req.body)
       if (!projectId) {
         return res.status(400).json({ message: 'Project ID is required' });
       }
      
-  
       // Find the project by projectId
       const project = await Project.findOne({ projectId }).exec();
   
@@ -163,7 +163,20 @@ const updateProject = asyncHandler(async (req, res) => {
         return res.status(404).json({ message: 'Project not found' });
       }
   
-      console.log(project);
+      //console.log(project);
+      console.log("BUILDING DATA", buildingData, "TASK DATA", taskData)
+      if (taskData && buildingData) {
+        const completeDataEntry = { buildingData, ...taskData };
+        
+        // Check if this data entry already exists in the completeData array
+        const exists = project.completeData.some(entry =>
+          JSON.stringify(entry) === JSON.stringify(completeDataEntry)
+        );
+      
+        if (!exists) {
+          project.completeData.push(completeDataEntry);
+        }
+      }
   
       // update the project fields that u want
       if (updatedData?.projectName) {
