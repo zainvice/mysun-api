@@ -63,28 +63,52 @@ const getAllTaskAssignments = asyncHandler(async (req, res) => {
 const updateTaskAssignmentById = async (req, res) => {
 
     const { _id ,taskData, notes, status, timeTaken } = req.body;
-    console.log(req.body)
+    
     if(!_id){
       console.log("ID not found abort!")
       return res.status(400).json({error: 'ID not found'})
     }
-    const updatedTaskAssignment = await TaskAssigned.findByIdAndUpdate(
-      _id,
-      { taskData, notes, status, timeTaken },
-      { new: true }
-    );
+    const task = await TaskAssigned.findById(_id).exec()
+    if(!task){
+      return res.status(400).json({error: 'TASK not found'})
+    }
+    // Assuming building number is present in the taskData
+    const buildingNumber = task.taskData['building number'];
 
-    if (!updatedTaskAssignment) {
+    // Find the corresponding building in the taskData or create it if it doesn't exist
+    if (!task.taskData[buildingNumber]) {
+      task.taskData[buildingNumber] = [];
+    }
+
+    // Add the new task data to the array under the building number
+    task.taskData[buildingNumber].push({
+        taskData
+    });
+    console.log("Displaying Task",task)
+    if(notes){
+      task.notes= notes
+    }
+    if(status){
+      task.status= status
+
+    }
+    if(timeTaken){
+      task.timeTaken= timeTaken
+    }
+    const saved = await task.save()
+    
+
+    if (!saved) {
       return res.status(404).json({ error: 'Task assignment not found' });
     }
-    if(updatedTaskAssignment){
-      const email= updatedTaskAssignment.worker.email
+    if(saved){
+      /* const email= saved?.worker.email
       const worker= await User.findOne({email}).exec()
       if(worker){
         worker.workhours= worker.workhours+timeTaken
         await worker.save()
         console.log("Worker Updated!")
-      }
+      } */
 
 
 
@@ -92,7 +116,7 @@ const updateTaskAssignmentById = async (req, res) => {
     if(!updateTaskAssignmentById){
       res.status(500).json({ error: 'Error updating task assignment' });
     }
-    res.status(200).json(updatedTaskAssignment);
+    res.status(200).json(saved);
   
     
   

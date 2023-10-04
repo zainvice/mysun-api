@@ -3,6 +3,15 @@ const asyncHandler = require("express-async-handler");
 const Task = require("../models/Task")
 const User = require("../models/user")
 
+function compareTasks(task1, task2) {
+  for (const key in task1) {
+    if (task1[key] !== task2[key]) {
+      return false;
+    }
+  }
+  return true;
+}
+
 const distributeTasks = async (projectData, workers, projectId) => {
   const nonSupervisorWorkers = workers.filter(worker => worker.role !== 'supervisor');
   const SupervisorWorkers = workers.filter(worker => worker.role === 'supervisor');
@@ -17,7 +26,20 @@ const distributeTasks = async (projectData, workers, projectId) => {
   const tasksPerWorker = Math.ceil(projectData.tasks.length / nonSupervisorWorkers.length);
   let tasknum=0
   const newTasks = [];
-
+  const semail = SupervisorWorkers[0].email
+  const superviosrFound = await User.findOne({email: semail}).exec()
+  const project = await Project.findById({_id: projectId});
+  for(const task of projectData?.tasks){
+    console.log(task)
+    const taskData= task.tasksData
+    const newTask = await Task.create({ taskData: task, projectId, supervisor: superviosrFound});
+    if(newTask){
+      console.log("TASK CREATED SUCCESSFULLY!")
+    }
+    if(project){
+      project.tasks.push(newTask._id)
+    }
+  }
   for (let index = 0; index < nonSupervisorWorkers.length; index++) {
     const worker = nonSupervisorWorkers[index];
     const startIndex = index * tasksPerWorker;
@@ -28,12 +50,13 @@ const distributeTasks = async (projectData, workers, projectId) => {
     const workerFound = await User.findOne({ email }).exec();
     const semail = SupervisorWorkers[0].email
     const superviosrFound = await User.findOne({email: semail}).exec()
-    const project = await Project.findById({_id: projectId});
+    
+    
     
     if (workerFound) {
       //console.log(workerFound)
       //console.log(workerTasks)
-      const taskPromises = workerTasks.map(async tasksData => {
+      /* const taskPromises = workerTasks.map(async tasksData => {
         const taskData= tasksData
         console.log("Creating")
         tasknum=tasknum+1
@@ -46,19 +69,19 @@ const distributeTasks = async (projectData, workers, projectId) => {
         return newTask;
       });
       
-      const tasksForWorker = await Promise.all(taskPromises);
+      const tasksForWorker = await Promise.all(taskPromises); */
       //console.log(tasksForWorker)
-      for (let index = 0; index < tasksForWorker.length; index++){
+      /* for (let index = 0; index < tasksForWorker.length; index++){
         
         //workerFound.tasks.push(tasksForWorker[index]._id);
         
-      }
+      } */
       superviosrFound.projects.push(projectId)
       await superviosrFound.save();
       workerFound.projects.push(projectId)
       await workerFound.save();
       await project.save()
-      newTasks.push({ workerId: worker.id, tasks: tasksForWorker });
+      newTasks.push({ workerId: worker.id});
     }
   }
 
@@ -118,7 +141,7 @@ const createProject = async (req, res) => {
     
     const savedProject = await newProject.save();
     res.status(201).json(savedProject);
-    const assignedTasks = await distributeTasks(projectData, workers, savedProject._id)
+    const assignedTasks = await distributeTasks(buildingData, workers, savedProject._id)
     if(savedProject){
        
      /*  sendEmail(
@@ -155,18 +178,19 @@ const updateProject = asyncHandler(async (req, res) => {
       if (!projectId) {
         return res.status(400).json({ message: 'Project ID is required' });
       }
-     
+      console.log(req.body)
       // Find the project by projectId
       const project = await Project.findOne({ projectId }).exec();
-  
+      
       if (!project) {
         return res.status(404).json({ message: 'Project not found' });
       }
   
       //console.log(project);
       console.log("BUILDING DATA", buildingData, "TASK DATA", taskData)
+
       if (taskData && buildingData) {
-        const completeDataEntry = { buildingData, ...taskData };
+        const completeDataEntry = { "building number": buildingData, ...taskData };
         
         // Check if this data entry already exists in the completeData array
         const exists = project.completeData.some(entry =>
@@ -177,7 +201,22 @@ const updateProject = asyncHandler(async (req, res) => {
           project.completeData.push(completeDataEntry);
         }
       }
-  
+      if(taskData){
+        /* console.log("TASKS",project.projectData.tasks)
+        console.log("TASK DATA",taskData) */
+
+        const taskDataString = JSON.stringify(taskData);
+        const newprojectdata = project.projectData.tasks.filter(task => {
+          const taskString = JSON.stringify(task);
+          console.log("TASK", taskString)
+          console.log("TASK DATA", taskDataString)
+          return taskString !== taskDataString;
+        });
+        console.log(newprojectdata)
+        const projectData = {tasks: newprojectdata}
+        project.projectData = projectData
+       
+      }
       // update the project fields that u want
       if (updatedData?.projectName) {
         project.projectName = updatedData?.projectName;
@@ -201,9 +240,9 @@ const updateProject = asyncHandler(async (req, res) => {
       if (updatedData?.status) {
         project.status = updatedData?.status;
       }
-      if (updatedData?.projectData) {
+     /*  if (updatedData?.projectData) {
         project.projectData = updatedData?.projectData;
-      }
+      } */
       if (updatedData?.projectDescription) {
         project.projectDescription = updatedData?.projectDescription;
       }
