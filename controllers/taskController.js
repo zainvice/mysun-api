@@ -1,20 +1,29 @@
 const TaskAssigned = require('../models/Task');
+const Project = require('../models/project')
 const asyncHandler= require('express-async-handler')
 const User = require('../models/user')
 // Create a new task assignment
 const createTaskAssignment = async (req, res) => {
   try {
-    const { taskData, notes, status } = req.body;
-
+    const { taskData, projectId, supervisor } = req.body;
+    
     const newTaskAssignment = new TaskAssigned({
       taskData,
-      notes,
-      status,
-      worker,
+      projectId, 
       supervisor
     });
-
+    
     const savedTaskAssignment = await newTaskAssignment.save();
+    if(savedTaskAssignment){
+      const _id = projectId
+      const project = await Project.findById(_id).exec()
+      if(project){
+        project.tasks.push(savedTaskAssignment)
+        await project.save()
+        console.log("Task created and added to project")
+      }
+
+    }
     res.status(201).json(savedTaskAssignment);
   } catch (error) {
     res.status(500).json({ error: 'Error creating task assignment' });
