@@ -43,6 +43,7 @@ const getAllTaskAssignments = asyncHandler(async (req, res) => {
   tasks.sort((task1, task2) => {
     const statusOrder = {
       'Pending': 1,
+      'Coordination Letter': 2,
       'Coordination Letter 1': 2,
       'Coordination Letter 2': 3,
       'Office Work': 4,
@@ -90,10 +91,10 @@ const updateTaskAssignmentById = async (req, res) => {
     }
 
     // Add the new task data to the array under the building number
-    task.taskData[buildingNumber].push({
+    task.taskData[buildingNumber].push(
         taskData
-    });
-    console.log("Displaying Task",task)
+    );
+    console.log("Displaying Task",task )
     if(notes){
       task.notes= notes
     }
@@ -104,8 +105,8 @@ const updateTaskAssignmentById = async (req, res) => {
     if(timeTaken){
       task.timeTaken= timeTaken
     }
-    const saved = await task.save()
-    
+    const saved = await TaskAssigned.findByIdAndUpdate(task._id, task)
+    console.log("SAVED", saved)
 
     if (!saved) {
       return res.status(404).json({ error: 'Task assignment not found' });

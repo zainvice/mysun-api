@@ -129,6 +129,7 @@ const createProject = async (req, res) => {
       projectId,
       projectName,
       projectData,
+      originalData: projectData,
       buildingData,
       projectDescription,
       projectFile,

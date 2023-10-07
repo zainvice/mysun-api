@@ -15,6 +15,10 @@ const projectSchema = new mongoose.Schema(
       type: Object,
       required: false,
     },
+    originalData: {
+      type: Object,
+      required: false,
+    },
     projectFile: {
       type: Buffer, 
       required: false, 
