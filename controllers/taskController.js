@@ -43,6 +43,8 @@ const getAllTaskAssignments = asyncHandler(async (req, res) => {
   tasks.sort((task1, task2) => {
     const statusOrder = {
       'Pending': 1,
+      'Field Mapped':2,
+      'Fully Mapped':2,
       'Coordination Letter': 2,
       'Coordination Letter 1': 2,
       'Coordination Letter 2': 3,
