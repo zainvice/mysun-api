@@ -174,12 +174,15 @@ const getAllProjects = asyncHandler(async (req, res) => {
 //update project by using projectId
 const updateProject = asyncHandler(async (req, res) => {
     try {
-      const { projectId, updatedData, workers, taskData, buildingData } = req.body;
+      const { projectId, updatedData, workers, taskData, buildingData, manual } = req.body;
       console.log(req.body)
       if (!projectId) {
         return res.status(400).json({ message: 'Project ID is required' });
       }
       console.log(req.body)
+      if(manual===true){
+        taskData['manual'] = 'Manually entered';
+      }
       // Find the project by projectId
       const project = await Project.findOne({ projectId }).exec();
       

@@ -74,8 +74,8 @@ const getAllTaskAssignments = asyncHandler(async (req, res) => {
 // Update a task assignment by ID
 const updateTaskAssignmentById = async (req, res) => {
 
-    const { _id ,taskData, notes, status, timeTaken } = req.body;
-    
+    const { _id ,taskData, notes, status, timeTaken, manual } = req.body;
+    console.log(req.body)
     if(!_id){
       console.log("ID not found abort!")
       return res.status(400).json({error: 'ID not found'})
@@ -87,6 +87,10 @@ const updateTaskAssignmentById = async (req, res) => {
     // Assuming building number is present in the taskData
     const buildingNumber = task.taskData['building number'];
 
+    if(manual===true){
+      taskData['manual'] = 'Manually entered';
+    }
+    console.log(taskData, "TASK")
     // Find the corresponding building in the taskData or create it if it doesn't exist
     if (!task.taskData[buildingNumber]) {
       task.taskData[buildingNumber] = [];

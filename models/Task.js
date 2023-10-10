@@ -30,6 +30,9 @@ const Task = new mongoose.Schema({
   timeTaken:{
     
   },
+  manual:{
+    type: Boolean
+  }
   
 }, 
 {
