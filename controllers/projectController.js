@@ -173,7 +173,7 @@ const getAllProjects = asyncHandler(async (req, res) => {
 
 //update project by using projectId
 const updateProject = asyncHandler(async (req, res) => {
-    try {
+    
       const { projectId, updatedData, workers, taskData, buildingData, manual } = req.body;
       console.log(req.body)
       if (!projectId) {
@@ -197,14 +197,17 @@ const updateProject = asyncHandler(async (req, res) => {
         const completeDataEntry = { "building number": buildingData, ...taskData };
         
         // Check if this data entry already exists in the completeData array
-        const exists = project.completeData.some(entry =>
-          JSON.stringify(entry) === JSON.stringify(completeDataEntry)
-        );
-      
-        if (!exists) {
+        const existingIndex = project.completeData.findIndex(entry => entry["building number"] === buildingData);
+        console.log(existingIndex)
+        if (existingIndex !== -1) {
+          // Update the existing entry with the new data
+          Object.assign(project.completeData[existingIndex], completeDataEntry);
+        } else {
+          // Add the new entry to the completeData array
           project.completeData.push(completeDataEntry);
         }
       }
+      console.log("Updated Here", project)
       if(taskData){
         /* console.log("TASKS",project.projectData.tasks)
         console.log("TASK DATA",taskData) */
@@ -212,11 +215,11 @@ const updateProject = asyncHandler(async (req, res) => {
         const taskDataString = JSON.stringify(taskData);
         const newprojectdata = project.projectData.tasks.filter(task => {
           const taskString = JSON.stringify(task);
-          console.log("TASK", taskString)
-          console.log("TASK DATA", taskDataString)
+          //console.log("TASK", taskString)
+          //console.log("TASK DATA", taskDataString)
           return taskString !== taskDataString;
         });
-        console.log(newprojectdata)
+        
         const projectData = {tasks: newprojectdata}
         project.projectData = projectData
        
@@ -234,7 +237,7 @@ const updateProject = asyncHandler(async (req, res) => {
       if (updatedData?.admin) {
         project.admin = updatedData?.admin;
       }
-      console.log("found Workers", workers)
+      
       if (workers) {
        
         for(const worker of workers){
@@ -252,7 +255,7 @@ const updateProject = asyncHandler(async (req, res) => {
       }
   
       // Save the updated project
-      const updatedProject = await project.save();
+      const updatedProject = await Project.findByIdAndUpdate(project._id, project);
       
       console.log("updated project")
       console.log(updatedProject);
@@ -270,9 +273,9 @@ const updateProject = asyncHandler(async (req, res) => {
     }
   
       return res.status(200).json({ message: `${updatedProject.projectName} updated!`, updatedProject });
-    } catch (error) {
-      return res.status(500).json({ error: 'Error updating project' });
-    }
+   
+      
+   
   });
   
 

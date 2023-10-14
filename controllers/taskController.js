@@ -16,8 +16,14 @@ const createTaskAssignment = async (req, res) => {
     const savedTaskAssignment = await newTaskAssignment.save();
     if(savedTaskAssignment){
       const _id = projectId
-      const project = await Project.findById(_id).exec()
+      const project = await Project.findById(_id).populate('tasks').exec();
       if(project){
+        console.log("PROJECT", project)
+        const duplicates = project?.tasks.find(task => task.taskData["building number"] === taskData["building number"]);
+        if(duplicates){
+          console.log("Duplicate Found!")
+          return res.status(200).json(duplicates);
+        }
         project.tasks.push(savedTaskAssignment)
         await project.save()
         console.log("Task created and added to project")
@@ -80,6 +86,7 @@ const updateTaskAssignmentById = async (req, res) => {
       console.log("ID not found abort!")
       return res.status(400).json({error: 'ID not found'})
     }
+    
     const task = await TaskAssigned.findById(_id).exec()
     if(!task){
       return res.status(400).json({error: 'TASK not found'})
@@ -97,9 +104,8 @@ const updateTaskAssignmentById = async (req, res) => {
     }
 
     // Add the new task data to the array under the building number
-    task.taskData[buildingNumber].push(
-        taskData
-    );
+    task.taskData[buildingNumber] = [taskData];
+
     console.log("Displaying Task",task )
     if(notes){
       task.notes= notes
