@@ -94,7 +94,7 @@ const updateTaskAssignmentById = async (req, res) => {
     // Assuming building number is present in the taskData
     const buildingNumber = task.taskData['building number'];
 
-    if(manual===true){
+    /* if(manual===true){
       taskData['manual'] = 'Manually entered';
     }
     console.log(taskData, "TASK")
@@ -104,8 +104,14 @@ const updateTaskAssignmentById = async (req, res) => {
     }
 
     // Add the new task data to the array under the building number
-    task.taskData[buildingNumber] = [taskData];
-
+    task.taskData[buildingNumber] = [taskData]; */
+    const completeDataEntry = { "building number": buildingNumber, ...taskData };
+    if(completeDataEntry){
+      task.taskData = completeDataEntry;
+    }
+    if(manual){
+      task.manual = manual;
+    }
     console.log("Displaying Task",task )
     if(notes){
       task.notes= notes
