@@ -117,11 +117,24 @@ const updateTaskAssignmentById = async (req, res) => {
       task.notes= notes
     }
     if(status){
+      const change = {
+        changedFrom: task.status,
+        changedTo: status,
+        changedOn: Date.now(),
+      }
+      task.statusHistory.push(change)
       task.status= status
+      if(status==="Coordination Letter"){
+        
+                const sevenDaysFromNow = new Date();
+                sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
+                task.timer= sevenDaysFromNow;
+          
+      }
 
     }
     if(timeTaken){
-      task.timeTaken= timeTaken
+      task.timeTaken= task.timeTaken + timeTaken
     }
     const saved = await TaskAssigned.findByIdAndUpdate(task._id, task)
     console.log("SAVED", saved)

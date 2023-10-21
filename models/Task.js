@@ -28,11 +28,18 @@ const Task = new mongoose.Schema({
     type: Object
   },
   timeTaken:{
-    
+    type: Number,
+    default: 0
   },
   manual:{
     type: Boolean
-  }
+  },
+  timer:{
+    type: Date
+  },
+  statusHistory:[{
+    type: Object
+  }]
   
 }, 
 {
