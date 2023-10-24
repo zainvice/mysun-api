@@ -39,41 +39,14 @@ const createTaskAssignment = async (req, res) => {
 // Get all task assignments
 
 const getAllTaskAssignments = asyncHandler(async (req, res) => {
-  const tasks = await TaskAssigned.find().populate('projectId').lean();
+  const tasks = await TaskAssigned.find().lean();
   
   if (!tasks?.length) {
     return res.status(400).json({ message: 'No tasks found' });
   }
-
-  // Sort tasks based on status
-  tasks.sort((task1, task2) => {
-    const statusOrder = {
-      'Pending': 1,
-      'Field Mapped':2,
-      'Fully Mapped':2,
-      'Coordination Letter': 2,
-      'Coordination Letter 1': 2,
-      'Coordination Letter 2': 3,
-      'Office Work': 4,
-      'Measurement in Assessment': 5,
-      'Partly Measured': 6,
-      'Missing Information': 7,
-      'United Address': 8,
-      'Refused Survey': 9,
-      'Fixing Required': 10,
-      'Examination': 11,
-      'Ready for Delivery': 12,
-      'Delivered': 13,
-    };
-
-    const status1 = task1.status;
-    const status2 = task2.status;
-
-    return statusOrder[status1] - statusOrder[status2];
-  });
-
   res.json(tasks);
 });
+
 
 
 
