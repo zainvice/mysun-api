@@ -9,5 +9,7 @@ router.route('/')
     .post(taskController.createTaskAssignment) //CREATE
     .patch(taskController.updateTaskAssignmentById) //UPDATE
     .delete(taskController.deleteTaskAssignmentById) //DELETE
+router.route('/byId')
+    .post(taskController.getTaskById);
 
 module.exports=router
