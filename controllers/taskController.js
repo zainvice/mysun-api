@@ -64,7 +64,7 @@ const getTaskById = asyncHandler(async(req, res)=>{
 // Update a task assignment by ID
 const updateTaskAssignmentById = async (req, res) => {
 
-    const { _id ,taskData, notes, status, timeTaken, manual } = req.body;
+    const { _id ,taskData, notes, status, timeTaken, manual, classification, propertyType, stats, floor } = req.body;
     console.log(req.body)
     if(!_id){
       console.log("ID not found abort!")
@@ -116,6 +116,48 @@ const updateTaskAssignmentById = async (req, res) => {
           
       }
 
+    }
+    if(classification){
+      const change = {
+        changedFrom: task.classification,
+        changedTo: classification,
+        changedOn: Date.now(),
+      }
+      task.classificationHistory.push(change)
+      task.classification= classification
+      if(classification==="Coordination Letter 1" || classification==="Coordination Letter 2"){
+        
+                const sevenDaysFromNow = new Date();
+                sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
+                task.timer= sevenDaysFromNow;
+          
+      }
+
+    }
+    if(propertyType){
+      const change = {
+        changedFrom: task.propertyType,
+        changedTo: propertyType,
+        changedOn: Date.now(),
+      }
+      task.propertyTypeHistory.push(change)
+      task.propertyType= propertyType
+     
+
+    }
+    if(stats){
+      const change = {
+        changedFrom: task.stats,
+        changedTo: stats,
+        changedOn: Date.now(),
+      }
+      task.statsHistory.push(change)
+      task.stats= stats
+     
+
+    }
+    if(floor){
+      task.floor = floor;
     }
     if(timeTaken){
       task.timeTaken= task.timeTaken + timeTaken

@@ -21,6 +21,22 @@ const Task = new mongoose.Schema({
     type: String,
     default:"Pending",
   },
+  classification:{
+    type: String,
+    default:"None",
+  },
+  propertyType:[{
+    type: String,
+    default:"None",
+  }],
+  stats:[{
+    type: String,
+    default:"None",
+  }],
+  floor:{
+    type:String,
+
+  },
   worker: {
     type: Object
   },
@@ -38,6 +54,15 @@ const Task = new mongoose.Schema({
     type: Date
   },
   statusHistory:[{
+    type: Object
+  }],
+  classificationHistory:[{
+    type: Object
+  }],
+  propertyTypeHistory:[{
+    type: Object
+  }],
+  statsHistory:[{
     type: Object
   }]
   
