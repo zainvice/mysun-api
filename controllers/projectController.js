@@ -141,10 +141,11 @@ const createProject = async (req, res) => {
     });
     
     const savedProject = await newProject.save();
-    res.status(201).json(savedProject);
+
     const assignedTasks = await distributeTasks(buildingData, workers, savedProject._id)
-    if(savedProject){
-       
+    
+    if(savedProject&&assignedTasks){
+       return res.status(201).json({message: `Project ${savedProject.projectName} created successfully!` });
      /*  sendEmail(
           savedProject.workers.supervisor.email,
           "New Project Assigned",
@@ -154,7 +155,8 @@ const createProject = async (req, res) => {
           },
           "./template/newProject.handlebars"
         ); */
-  }
+    }
+    
 
   } catch (error) {
     console.log(error)
