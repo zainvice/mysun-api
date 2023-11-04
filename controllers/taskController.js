@@ -64,7 +64,7 @@ const getTaskById = asyncHandler(async(req, res)=>{
 // Update a task assignment by ID
 const updateTaskAssignmentById = async (req, res) => {
 
-    const { _id ,taskData, notes, status, timeTaken, manual, classification, propertyType, stats, floor } = req.body;
+    const { _id ,taskData, notes, status, timeTaken, manual, classification, propertyType, stats, floor, resetType } = req.body;
     console.log(req.body)
     if(!_id){
       console.log("ID not found abort!")
@@ -106,7 +106,8 @@ const updateTaskAssignmentById = async (req, res) => {
         changedTo: status,
         changedOn: Date.now(),
       }
-      task.statusHistory.push(change)
+      if(task.status!=status)
+          task.statusHistory.push(change)
       task.status= status
       if(status==="Coordination Letter"){
         
@@ -123,7 +124,8 @@ const updateTaskAssignmentById = async (req, res) => {
         changedTo: classification,
         changedOn: Date.now(),
       }
-      task.classificationHistory.push(change)
+      if(task.classification!=classification)
+          task.classificationHistory.push(change)
       task.classification= classification
       if(classification==="Coordination Letter 1" || classification==="Coordination Letter 2"){
         
@@ -140,7 +142,8 @@ const updateTaskAssignmentById = async (req, res) => {
         changedTo: propertyType,
         changedOn: Date.now(),
       }
-      task.propertyTypeHistory.push(change)
+      if(task.propertyType!=propertyType)
+          task.propertyTypeHistory.push(change)
       task.propertyType= propertyType
      
 
@@ -151,7 +154,9 @@ const updateTaskAssignmentById = async (req, res) => {
         changedTo: stats,
         changedOn: Date.now(),
       }
-      task.statsHistory.push(change)
+      if(task.stats!=stats)
+        task.statsHistory.push(change)
+     
       task.stats= stats
      
 
@@ -162,11 +167,41 @@ const updateTaskAssignmentById = async (req, res) => {
     if(timeTaken){
       task.timeTaken= task.timeTaken + timeTaken
     }
+    if(resetType){
+      if(resetType==="Partial"){
+        console.log("reseting")
+        const newtaskData = {"building number": buildingNumber}
+        console.log("reseting to", newtaskData)
+        task.taskData = newtaskData
+      }
+      if(resetType==="Full"){
+        console.log("reseting")
+        const newtaskData = {"building number": buildingNumber}
+        console.log("reseting to", newtaskData)
+        task.taskData = newtaskData
+        task.status = "Pending"
+        task.statusHistory = []
+        task.classification = "None"
+        task.classificationHistory = []
+        task.propertyTypeHistory = []
+        task.statsHistory = []
+        task.propertyType = ["None"]
+        task.stats = ["None"]
+        task.floor = undefined
+      }
+    }
+
     const saved = await TaskAssigned.findByIdAndUpdate(task._id, task)
     console.log("SAVED", saved)
 
     if (!saved) {
       return res.status(404).json({ error: 'Task assignment not found' });
+    }
+    if(resetType){
+      if(resetType==="Partial"){
+        const taskData = {buildingNumber: buildingNumber}
+        task.taskData = taskData
+      }
     }
     if(saved){
       /* const email= saved?.worker.email

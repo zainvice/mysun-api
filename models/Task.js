@@ -64,8 +64,13 @@ const Task = new mongoose.Schema({
   }],
   statsHistory:[{
     type: Object
-  }]
-  
+  }],
+  editedBy:[{
+    type: String
+  }],
+  completedBy:[{
+    type: String
+  }],
 }, 
 {
     timestamps:true

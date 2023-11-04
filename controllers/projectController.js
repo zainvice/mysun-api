@@ -15,10 +15,10 @@ function compareTasks(task1, task2) {
 const distributeTasks = async (projectData, workers, projectId) => {
   const nonSupervisorWorkers = workers.filter(worker => worker.role !== 'supervisor');
   const SupervisorWorkers = workers.filter(worker => worker.role === 'supervisor');
-  console.log(SupervisorWorkers)
+  //console.log(SupervisorWorkers)
 
   if (projectData.tasks.length === 0 || nonSupervisorWorkers.length === 0) {
-    console.log("No tasks to distribute or no non-supervisor workers.");
+    //console.log("No tasks to distribute or no non-supervisor workers.");
     return [];
   }
 
@@ -30,11 +30,11 @@ const distributeTasks = async (projectData, workers, projectId) => {
   const superviosrFound = await User.findOne({email: semail}).exec()
   const project = await Project.findById({_id: projectId});
   for(const task of projectData?.tasks){
-    console.log(task)
+    //console.log(task)
     const taskData= task.tasksData
     const newTask = await Task.create({ taskData: task, projectId, supervisor: superviosrFound});
     if(newTask){
-      console.log("TASK CREATED SUCCESSFULLY!")
+      //console.log("TASK CREATED SUCCESSFULLY!")
     }
     if(project){
       project.tasks.push(newTask._id)
@@ -54,23 +54,23 @@ const distributeTasks = async (projectData, workers, projectId) => {
     
     
     if (workerFound) {
-      //console.log(workerFound)
-      //console.log(workerTasks)
+      ////console.log(workerFound)
+      ////console.log(workerTasks)
       /* const taskPromises = workerTasks.map(async tasksData => {
         const taskData= tasksData
-        console.log("Creating")
+        //console.log("Creating")
         tasknum=tasknum+1
         const newTask = await Task.create({ taskData, projectId, supervisor: superviosrFound, worker: workerFound });
         if(project){
-          console.log("added task: ", tasknum, newTask._id,"to", project.projectName)
+          //console.log("added task: ", tasknum, newTask._id,"to", project.projectName)
           project.tasks.push(newTask._id)
         }
-        console.log("new Task created")
+        //console.log("new Task created")
         return newTask;
       });
       
       const tasksForWorker = await Promise.all(taskPromises); */
-      //console.log(tasksForWorker)
+      ////console.log(tasksForWorker)
       /* for (let index = 0; index < tasksForWorker.length; index++){
         
         //workerFound.tasks.push(tasksForWorker[index]._id);
@@ -143,7 +143,7 @@ const createProject = async (req, res) => {
     const savedProject = await newProject.save();
 
     const assignedTasks = await distributeTasks(buildingData, workers, savedProject._id)
-    
+
     if(savedProject&&assignedTasks){
        return res.status(201).json({message: `Project ${savedProject.projectName} created successfully!` });
      /*  sendEmail(
@@ -159,7 +159,7 @@ const createProject = async (req, res) => {
     
 
   } catch (error) {
-    console.log(error)
+    //console.log(error)
     res.status(500).json({ error: "Error creating Project" });
   }
 };
@@ -176,12 +176,12 @@ const getAllProjects = asyncHandler(async (req, res) => {
 //update project by using projectId
 const updateProject = asyncHandler(async (req, res) => {
     
-      const { projectId, updatedData, workers, taskData, buildingData, manual } = req.body;
-      console.log(req.body)
+      const { projectId, updatedData, workers, taskData, buildingData, manual, resetType } = req.body;
+      //console.log(req.body)
       if (!projectId) {
         return res.status(400).json({ message: 'Project ID is required' });
       }
-      console.log(req.body)
+      //console.log(req.body)
       if(manual===true){
         taskData['manual'] = 'Manually entered';
       }
@@ -192,15 +192,15 @@ const updateProject = asyncHandler(async (req, res) => {
         return res.status(404).json({ message: 'Project not found' });
       }
   
-      //console.log(project);
-      console.log("BUILDING DATA", buildingData, "TASK DATA", taskData)
+      ////console.log(project);
+      //console.log("BUILDING DATA", buildingData, "TASK DATA", taskData)
 
       if (taskData && buildingData) {
         const completeDataEntry = { "building number": buildingData, ...taskData };
         
         // Check if this data entry already exists in the completeData array
         const existingIndex = project.completeData.findIndex(entry => entry["building number"] === buildingData);
-        console.log(existingIndex)
+        //console.log(existingIndex)
         if (existingIndex !== -1) {
           // Update the existing entry with the new data
           Object.assign(project.completeData[existingIndex], completeDataEntry);
@@ -208,22 +208,48 @@ const updateProject = asyncHandler(async (req, res) => {
           // Add the new entry to the completeData array
           project.completeData.push(completeDataEntry);
         }
-      }
-      console.log("Updated Here", project)
-      if(taskData){
-        /* console.log("TASKS",project.projectData.tasks)
-        console.log("TASK DATA",taskData) */
 
-        const taskDataString = JSON.stringify(taskData);
+      }
+      //console.log("Updated Here", project)
+      if(taskData){
+        if (taskData) {
+          if (resetType === "Full" || resetType === "Partial") {
+            
+            const { ["building number"]: removedBuildingNumber, ...newTaskData } = taskData;
+        
+            
+            const data = project.projectData.tasks;
+            data.push(newTaskData);
+        
+            
+            const newData = { tasks: data };
+            project.projectData = newData;
+        
+            
+            console.log("Removed 'building number':", removedBuildingNumber);
+        } else {
+            // Your existing logic to filter out taskData
+            const taskDataString = JSON.stringify(taskData);
+            const newprojectdata = project.projectData.tasks.filter((task) => {
+              const taskString = JSON.stringify(task);
+              return taskString !== taskDataString;
+            });
+            const projectData = {tasks: newprojectdata}
+            project.projectData = projectData
+          }
+        }
+        
+        
+        /* const taskDataString = JSON.stringify(taskData);
         const newprojectdata = project.projectData.tasks.filter(task => {
           const taskString = JSON.stringify(task);
-          //console.log("TASK", taskString)
-          //console.log("TASK DATA", taskDataString)
+          ////console.log("TASK", taskString)
+          ////console.log("TASK DATA", taskDataString)
           return taskString !== taskDataString;
         });
         
         const projectData = {tasks: newprojectdata}
-        project.projectData = projectData
+        project.projectData = projectData */
        
       }
       // update the project fields that u want
@@ -259,8 +285,8 @@ const updateProject = asyncHandler(async (req, res) => {
       // Save the updated project
       const updatedProject = await Project.findByIdAndUpdate(project._id, project);
       
-      console.log("updated project")
-      console.log(updatedProject);
+      //console.log("updated project")
+      //console.log(updatedProject);
       if(updatedProject){
        
         /* sendEmail(
@@ -286,14 +312,14 @@ const updateProject = asyncHandler(async (req, res) => {
 const deleteProject = asyncHandler(async (req, res) => {
   try {
     const { projectId } = req.body;
-    console.log(projectId);
+    //console.log(projectId);
     if (!projectId) {
       return res.status(400).json({ message: "Project ID is required" });
     }
 
     // Find the project by projectId
     const project = await Project.findOne({ projectId }).exec();
-    console.log(project);
+    //console.log(project);
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }
