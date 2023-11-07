@@ -66,7 +66,7 @@ const Task = new mongoose.Schema({
     type: Object
   }],
   editedBy:[{
-    type: String
+    type: Object
   }],
   completedBy:[{
     type: String

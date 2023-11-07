@@ -64,7 +64,7 @@ const getTaskById = asyncHandler(async(req, res)=>{
 // Update a task assignment by ID
 const updateTaskAssignmentById = async (req, res) => {
 
-    const { _id ,taskData, notes, status, timeTaken, manual, classification, propertyType, stats, floor, resetType } = req.body;
+    const { _id ,taskData, notes, status, timeTaken, manual, classification, propertyType, stats, floor, resetType, editedBy } = req.body;
     console.log(req.body)
     if(!_id){
       console.log("ID not found abort!")
@@ -99,6 +99,32 @@ const updateTaskAssignmentById = async (req, res) => {
     console.log("Displaying Task",task )
     if(notes){
       task.notes= notes
+    }
+    if (editedBy) {
+      const change = {
+        email: editedBy,
+        editedOn: Date.now(),
+      };
+    
+      if (task.editedBy) {
+        let found = false;
+    
+        for (let i = 0; i < task.editedBy.length; i++) {
+          if (task.editedBy[i].email === editedBy) {
+            
+            task.editedBy[i].editedOn = change.editedOn;
+            found = true;
+            break;
+          }
+        }
+    
+        if (!found) {
+          
+          task.editedBy.push(change);
+        }
+      } else {
+        task.editedBy = [change];
+      }
     }
     if(status){
       const change = {
