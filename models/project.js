@@ -33,7 +33,7 @@ const projectSchema = new mongoose.Schema(
     },
     endDate: {
       type: Date,
-      required: true,
+      required: false,
     },
     admin: {
       type: String,
