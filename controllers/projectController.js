@@ -176,12 +176,13 @@ const getAllProjects = asyncHandler(async (req, res) => {
 //update project by using projectId
 const updateProject = asyncHandler(async (req, res) => {
     
-      const { projectId, updatedData, workers, taskData, buildingData, manual, resetType } = req.body;
+         try{
+          const { projectId, updatedData, workers, taskData, buildingData, manual, resetType } = req.body;
       //console.log(req.body)
       if (!projectId) {
         return res.status(400).json({ message: 'Project ID is required' });
       }
-      //console.log(req.body)
+      console.log(req.body)
       if(manual===true){
         taskData['manual'] = 'Manually entered';
       }
@@ -214,7 +215,7 @@ const updateProject = asyncHandler(async (req, res) => {
       if(taskData){
         if (taskData) {
           if (resetType === "Full" || resetType === "Partial") {
-            
+            consol.log("DID'nt")
             const { ["building number"]: removedBuildingNumber, ...newTaskData } = taskData;
         
             
@@ -228,6 +229,7 @@ const updateProject = asyncHandler(async (req, res) => {
             
             console.log("Removed 'building number':", removedBuildingNumber);
         } else {
+            console.log("HERE")
             // Your existing logic to filter out taskData
             const taskDataString = JSON.stringify(taskData);
             const newprojectdata = project.projectData.tasks.filter((task) => {
@@ -236,6 +238,7 @@ const updateProject = asyncHandler(async (req, res) => {
             });
             const projectData = {tasks: newprojectdata}
             project.projectData = projectData
+            console.log("NOT HERE")
           }
         }
         
@@ -285,9 +288,11 @@ const updateProject = asyncHandler(async (req, res) => {
       // Save the updated project
       const updatedProject = await Project.findByIdAndUpdate(project._id, project);
       
-      //console.log("updated project")
+      console.log("updated project")
       //console.log(updatedProject);
       if(updatedProject){
+        console.log("SENDING RESPONSE")
+        return res.status(200).json({ message: `${updatedProject.projectName} updated!`});
        
         /* sendEmail(
             updatedProject.sender.email,
@@ -298,9 +303,12 @@ const updateProject = asyncHandler(async (req, res) => {
             },
             "./template/project.handlebars"
           ); */
-    }
+      }
+         }catch(error){
+           console.log("Error",error)
+         }
   
-      return res.status(200).json({ message: `${updatedProject.projectName} updated!`, updatedProject });
+      
    
       
    

@@ -170,7 +170,9 @@ const updateTaskAssignmentById = async (req, res) => {
       }
       if(task.propertyType!=propertyType)
           task.propertyTypeHistory.push(change)
-      task.propertyType= propertyType
+      
+      const renter = propertyType.filter(type=>type!=='None')
+      task.propertyType= renter
      
 
     }
@@ -182,8 +184,9 @@ const updateTaskAssignmentById = async (req, res) => {
       }
       if(task.stats!=stats)
         task.statsHistory.push(change)
-     
-      task.stats= stats
+      const renter = stats.filter(stat=>stat!=='None')
+      console.log("r", renter)
+      task.stats= renter
      
 
     }
