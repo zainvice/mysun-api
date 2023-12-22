@@ -2,6 +2,7 @@ const TaskAssigned = require('../models/Task');
 const Project = require('../models/project')
 const asyncHandler= require('express-async-handler')
 const User = require('../models/user')
+const cron = require('node-cron');
 // Create a new task assignment
 const createTaskAssignment = async (req, res) => {
   try {
@@ -12,7 +13,7 @@ const createTaskAssignment = async (req, res) => {
       projectId, 
       supervisor
     });
-    
+    return
     const savedTaskAssignment = await newTaskAssignment.save();
     if(savedTaskAssignment){
       const _id = projectId
@@ -34,6 +35,44 @@ const createTaskAssignment = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: 'Error creating task assignment' });
   }
+};
+const createMultipleTasks = async (req, res) => {
+    const { taskData, projectId, supervisor, tasks } = req.body;
+    
+    const newTaskAssignment = new TaskAssigned({
+      taskData,
+      projectId, 
+      supervisor
+    });
+    console.log(req.body)
+    const saveTasksPromises = tasks.map(async (taskc) => {
+      const taskData = { 'building number': taskc };
+      const newTaskAssignment = new TaskAssigned({
+        taskData,
+        projectId,
+        supervisor
+      });
+  
+      const savedTaskAssignment = await newTaskAssignment.save();
+      if (savedTaskAssignment) {
+        const _id = projectId;
+        const project = await Project.findById(_id).populate('tasks').exec();
+        if (project) {
+          console.log("PROJECT", project);
+          
+          project.tasks.push(savedTaskAssignment);
+          await project.save();
+          console.log(`Task ${taskc} created and added to project`);
+        }
+      }
+    });
+  
+    try {
+      await Promise.all(saveTasksPromises);
+      res.status(200).json({ error: 'Created All Tasks' });
+    } catch (error) {
+      res.status(500).json({ error: 'Error creating task assignment' });
+    }
 };
 
 // Get all task assignments
@@ -150,17 +189,17 @@ const updateTaskAssignmentById = async (req, res) => {
         changedTo: classification,
         changedOn: Date.now(),
       }
-      if(task.classification!=classification)
-          task.classificationHistory.push(change)
-      task.classification= classification
-      if(classification==="Coordination Letter 1" || classification==="Coordination Letter 2"){
+    if(task.classification!=classification){
+        task.classificationHistory.push(change)
+        task.classification= classification
+        if(classification==="Coordination Letter 1" || classification==="Coordination Letter 2"){
         
                 const sevenDaysFromNow = new Date();
                 sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
                 task.timer= sevenDaysFromNow;
           
-      }
-
+        }
+    }
     }
     if(propertyType){
       const change = {
@@ -270,7 +309,54 @@ const deleteTaskAssignmentById = async (req, res) => {
   }
 };
 
+cron.schedule('*/1440 * * * *',   async() => {
+  
+  const tasksToUpdate = await TaskAssigned.find({
+    $or: [
+        { classification: "Coordination Letter 1" },
+        { classification: "Coordination Letter 2" }
+    ]
+  }).exec();
+
+
+ 
+  tasksToUpdate.forEach(async (task) => {
+    if (
+      task.classification !== "Coordination Letter 1 Expired" &&
+      task.classification !== "Coordination Letter 2 Expired" &&
+      task.classification !== "Refused Survey" &&
+      task.classification !== "Coordinated"
+    ) {
+      if (task.classificationHistory.length > 0) {
+        const lastChange = task.classificationHistory[task.classificationHistory.length - 1];
+        const lastChangeDate = new Date(lastChange.changedOn);
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  
+        if (lastChangeDate < sevenDaysAgo) {
+          const change = {
+            changedFrom: lastChange.changedTo,
+            changedTo: lastChange.changedTo + " Expired",
+            changedOn: Date.now(),
+          }
+          task.classification = lastChange.changedTo + " Expired";
+          task.classificationHistory.push(change)
+          
+        }
+      }
+  
+      console.log("Changed Task", task)
+      await task.save();
+    }
+  });
+
+  console.log('Cron job executed successfully.');
+});
+
+
+
 module.exports={
+    createMultipleTasks,
     getAllTaskAssignments,
     createTaskAssignment,
     updateTaskAssignmentById,

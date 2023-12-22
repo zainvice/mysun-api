@@ -11,5 +11,7 @@ router.route('/')
     .delete(taskController.deleteTaskAssignmentById) //DELETE
 router.route('/byId')
     .post(taskController.getTaskById);
+router.route('/multiple')
+    .post(taskController.createMultipleTasks);
 
 module.exports=router

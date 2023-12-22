@@ -177,8 +177,8 @@ const getAllProjects = asyncHandler(async (req, res) => {
 const updateProject = asyncHandler(async (req, res) => {
     
          try{
-          const { projectId, updatedData, workers, taskData, buildingData, manual, resetType } = req.body;
-      //console.log(req.body)
+          const { projectId, updatedData, workers, taskData, buildingData, manual, resetType, updateWorkers, removedWorker } = req.body;
+      console.log(req.body)
       if (!projectId) {
         return res.status(400).json({ message: 'Project ID is required' });
       }
@@ -269,10 +269,26 @@ const updateProject = asyncHandler(async (req, res) => {
         project.admin = updatedData?.admin;
       }
       
-      if (workers) {
+      if (workers&&!updateWorkers) {
        
         for(const worker of workers){
           project.workers.push(worker)
+        }
+      }
+      if (workers&&updateWorkers&&removedWorker) {
+        project.workers = workers
+        if(removedWorker){
+           const worker = await User.findOne({email: removedWorker.email}).populate('projects').exec()
+           if(worker){
+             console.log("Before filter",worker.projects)
+             console.log("project", project.projectId)
+             worker.projects = worker.projects.filter((projecte)=> projecte.projectId!==project.projectId)
+             console.log("After filter",worker.projects)
+             const updatedWorker = await User.findByIdAndUpdate(worker._id, worker)
+             if(updatedWorker){
+               console.log("Worker updated successfully and removed from project!")
+             }
+           }
         }
       }
       if (updatedData?.status) {
@@ -320,24 +336,47 @@ const updateProject = asyncHandler(async (req, res) => {
 const deleteProject = asyncHandler(async (req, res) => {
   try {
     const { projectId } = req.body;
-    //console.log(projectId);
+    console.log(req.body);
     if (!projectId) {
       return res.status(400).json({ message: "Project ID is required" });
     }
 
     // Find the project by projectId
-    const project = await Project.findOne({ projectId }).exec();
+    const project = await Project.findById({ _id: projectId }).exec();
     //console.log(project);
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
     }
+    if (project) {
+      const taskIds = project.tasks.map((task) => task._id);
+    
+      try {
+       
+        const removedTasks = await Task.deleteMany({ _id: { $in: taskIds } }).exec();
+    
+        console.log(`${removedTasks.deletedCount} tasks deleted.`);
+      } catch (error) {
+        console.error('Error occurred while deleting tasks', error);
+        
+      }
+      const users = await User.find().populate('projects').select('-password').lean()
+      if (users) {
+        users.forEach((user) => {
+          if (user.projects) {
+            user.projects = user.projects.filter((projecte) => projecte._id !== project._id);
+          }
+        });
+      }
+      
+    }
 
-    const deletedProject = await Project.deleteOne({ projectId });
+    
+    const deletedProject = await Project.deleteOne({ _id: project._id });
 
-    if (deletedProject.deletedCount === 1) {
+    if (deletedProject) {
       return res.status(200).json({ message: "Project deleted successfully" });
     } else {
-      return res.status(500).json({ error: "Error deleting project" });
+      return res.status(502).json({ error: "Error deleting project" });
     }
   } catch (error) {
     return res.status(500).json({ error: "Error deleting project" });

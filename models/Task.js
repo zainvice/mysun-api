@@ -33,10 +33,10 @@ const Task = new mongoose.Schema({
     type: String,
     default:"None",
   }],
-  floor:{
+  floor:[{
     type:String,
-
-  },
+    
+  }],
   worker: {
     type: Object
   },
