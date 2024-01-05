@@ -13,7 +13,7 @@ const createTaskAssignment = async (req, res) => {
       projectId, 
       supervisor
     });
-    return
+    
     const savedTaskAssignment = await newTaskAssignment.save();
     if(savedTaskAssignment){
       const _id = projectId
