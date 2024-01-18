@@ -273,6 +273,21 @@ const updateProject = asyncHandler(async (req, res) => {
        
         for(const worker of workers){
           project.workers.push(worker)
+          const workere = await User.findOne({email: worker.email}).populate('projects').exec()
+          if(workere){
+            console.log("Before filter",workere.projects)
+            console.log("project", project.projectId)
+            workere.projects.map((projecte)=>{
+              if(projecte.projectId!==project.projectId){
+                workere.projects.push(project)
+              }
+            })
+            console.log("After filter",workere.projects)
+            const updatedWorkere = await User.findByIdAndUpdate(workere._id, workere)
+            if(updatedWorkere){
+              console.log("Worker updated successfully and added to the project!")
+            }
+          }
         }
       }
       if (workers&&updateWorkers&&removedWorker) {
