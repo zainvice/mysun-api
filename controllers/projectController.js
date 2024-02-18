@@ -277,11 +277,21 @@ const updateProject = asyncHandler(async (req, res) => {
           if(workere){
             console.log("Before filter",workere.projects)
             console.log("project", project.projectId)
-            workere.projects.map((projecte)=>{
-              if(projecte.projectId!==project.projectId){
-                workere.projects.push(project)
+            console.log("worker projects", workere.projects)
+            if (workere.projects) {
+              // Check if the project is already in the worker's projects
+              const projectExists = workere.projects.some(projecte => projecte.projectId === project.projectId);
+              
+              // If the project doesn't exist, add it
+              if (!projectExists) {
+                  console.log("updating worker projects");
+                  workere.projects.push(project);
               }
-            })
+            } else {
+                // If the worker doesn't have any projects, add the project
+                console.log("updating worker projects");
+                workere.projects = [project];
+            }
             console.log("After filter",workere.projects)
             const updatedWorkere = await User.findByIdAndUpdate(workere._id, workere)
             if(updatedWorkere){

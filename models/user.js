@@ -60,7 +60,8 @@ const userSchema = new mongoose.Schema({
        
     },
     workhours: {
-
+        type: Number,
+        default: 0
     }
 
 

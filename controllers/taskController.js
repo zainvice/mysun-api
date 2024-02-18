@@ -140,6 +140,7 @@ const updateTaskAssignmentById = async (req, res) => {
       task.notes= notes
     }
     if (editedBy) {
+      const updateWorker = await User.findOne({email: editedBy}).exec()
       const change = {
         email: editedBy,
         editedOn: Date.now(),
@@ -147,7 +148,7 @@ const updateTaskAssignmentById = async (req, res) => {
     
       if (task.editedBy) {
         let found = false;
-    
+       
         for (let i = 0; i < task.editedBy.length; i++) {
           if (task.editedBy[i].email === editedBy) {
             
@@ -156,6 +157,7 @@ const updateTaskAssignmentById = async (req, res) => {
             break;
           }
         }
+        
     
         if (!found) {
           
@@ -164,6 +166,8 @@ const updateTaskAssignmentById = async (req, res) => {
       } else {
         task.editedBy = [change];
       }
+      updateWorker.workhours = updateWorker.workhours + timeTaken
+      await updateWorker.save()
     }
     if(status){
       const change = {
