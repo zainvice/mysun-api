@@ -32,15 +32,21 @@ const createTasks = async (projectData, workers, projectId) => {
   for(const task of projectData?.tasks){
     //console.log(task)
     const taskData= task.tasksData
-    const newTask = await Task.create({ taskData: task, projectId, supervisor: superviosrFound});
-    if(newTask){
-      console.log("TASK CREATED SUCCESSFULLY!")
+    try{
+      const newTask = await Task.create({ taskData: task, projectId, supervisor: superviosrFound});
+      if(newTask){
+        console.log("TASK CREATED SUCCESSFULLY!")
+      }
+      if(newTask && project){
+        console.log("ADDED TO PROJECT!")
+        project.tasks.push(newTask._id)
+        console.log("ADDED TO PROJECT!")
+      }
+    }catch(error){
+      console.error("COULDN\"T CRETE TASK")
+      return; 
     }
-    if(newTask && project){
-      console.log("ADDED TO PROJECT!")
-      project.tasks.push(newTask._id)
-      console.log("ADDED TO PROJECT!")
-    }
+    
   }
   for (let index = 0; index < nonSupervisorWorkers.length; index++) {
     const worker = nonSupervisorWorkers[index];
@@ -123,10 +129,10 @@ const createProject = async (req, res) => {
     
     const savedProject = await newProject.save();
     console.log("SAVING PROJECT DONE")
-
+    console.log("SENDING BUIDLING DATA", buildingData)
     const assignedTasks = await createTasks(buildingData, workers, savedProject._id)
 
-    console.log("E")
+    console.log("Done creating tasks")
     if(savedProject&&assignedTasks){
        return res.status(201).json({message: `Project ${savedProject.projectName} created successfully!` });
      /*  sendEmail(
