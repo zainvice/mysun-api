@@ -12,7 +12,7 @@ function compareTasks(task1, task2) {
   return true;
 }
 
-const distributeTasks = async (projectData, workers, projectId) => {
+const createTasks = async (projectData, workers, projectId) => {
   const nonSupervisorWorkers = workers.filter(worker => worker.role !== 'supervisor');
   const SupervisorWorkers = workers.filter(worker => worker.role === 'supervisor');
   //console.log(SupervisorWorkers)
@@ -34,10 +34,12 @@ const distributeTasks = async (projectData, workers, projectId) => {
     const taskData= task.tasksData
     const newTask = await Task.create({ taskData: task, projectId, supervisor: superviosrFound});
     if(newTask){
-      //console.log("TASK CREATED SUCCESSFULLY!")
+      console.log("TASK CREATED SUCCESSFULLY!")
     }
-    if(project){
+    if(newTask && project){
+      console.log("ADDED TO PROJECT!")
       project.tasks.push(newTask._id)
+      console.log("ADDED TO PROJECT!")
     }
   }
   for (let index = 0; index < nonSupervisorWorkers.length; index++) {
@@ -54,28 +56,7 @@ const distributeTasks = async (projectData, workers, projectId) => {
     
     
     if (workerFound) {
-      ////console.log(workerFound)
-      ////console.log(workerTasks)
-      /* const taskPromises = workerTasks.map(async tasksData => {
-        const taskData= tasksData
-        //console.log("Creating")
-        tasknum=tasknum+1
-        const newTask = await Task.create({ taskData, projectId, supervisor: superviosrFound, worker: workerFound });
-        if(project){
-          //console.log("added task: ", tasknum, newTask._id,"to", project.projectName)
-          project.tasks.push(newTask._id)
-        }
-        //console.log("new Task created")
-        return newTask;
-      });
       
-      const tasksForWorker = await Promise.all(taskPromises); */
-      ////console.log(tasksForWorker)
-      /* for (let index = 0; index < tasksForWorker.length; index++){
-        
-        //workerFound.tasks.push(tasksForWorker[index]._id);
-        
-      } */
       superviosrFound.projects.push(projectId)
       await superviosrFound.save();
       workerFound.projects.push(projectId)
@@ -141,9 +122,11 @@ const createProject = async (req, res) => {
     });
     
     const savedProject = await newProject.save();
+    console.log("SAVING PROJECT DONE")
 
-    const assignedTasks = await distributeTasks(buildingData, workers, savedProject._id)
+    const assignedTasks = await createTasks(buildingData, workers, savedProject._id)
 
+    console.log("E")
     if(savedProject&&assignedTasks){
        return res.status(201).json({message: `Project ${savedProject.projectName} created successfully!` });
      /*  sendEmail(
@@ -159,7 +142,8 @@ const createProject = async (req, res) => {
     
 
   } catch (error) {
-    //console.log(error)
+    console.log("DANG IT")
+    console.log(error)
     res.status(500).json({ error: "Error creating Project" });
   }
 };
