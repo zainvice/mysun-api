@@ -15,7 +15,7 @@ function compareTasks(task1, task2) {
 const createTasks = async (projectData, workers, projectId) => {
   const nonSupervisorWorkers = workers.filter(worker => worker.role !== 'supervisor');
   const SupervisorWorkers = workers.filter(worker => worker.role === 'supervisor');
-  //console.log(SupervisorWorkers)
+  console.log("PROJECT DATA GO NOW", projectData)
 
   if (projectData.tasks.length === 0 || nonSupervisorWorkers.length === 0) {
     //console.log("No tasks to distribute or no non-supervisor workers.");
