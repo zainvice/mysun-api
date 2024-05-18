@@ -38,7 +38,7 @@ const createTasks = async (projectData, workers, projectId) => {
         console.log("TASK CREATED SUCCESSFULLY!")
       }
       if(newTask && project){
-        console.log("ADDED TO PROJECT!")
+        
         project.tasks.push(newTask._id)
         console.log("ADDED TO PROJECT!")
       }
@@ -67,10 +67,11 @@ const createTasks = async (projectData, workers, projectId) => {
       await superviosrFound.save();
       workerFound.projects.push(projectId)
       await workerFound.save();
-      await project.save()
+      
       newTasks.push({ workerId: worker.id});
     }
   }
+  await project.save()
 
   return newTasks;
 };
