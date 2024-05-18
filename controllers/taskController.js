@@ -88,6 +88,20 @@ const getAllTaskAssignments = asyncHandler(async (req, res) => {
   res.json(tasks);
 });
 
+const getTasksByProjectId = asyncHandler(async (req, res) => {
+  console.log(req.body)
+
+  const {projectId} = req.body
+  const tasks = await TaskAssigned.find({projectId}).populate('projectId').lean();
+  
+  if (!tasks?.length) {
+    return res.status(400).json({ message: 'No tasks found' });
+  }
+
+
+  res.json(tasks);
+});
+
 const getTaskById = asyncHandler(async(req, res)=>{
     console.log(req.body)
     const {_id} = req.body
@@ -366,5 +380,6 @@ module.exports={
     updateTaskAssignmentById,
     deleteTaskAssignmentById,
     getTaskById,
+    getTasksByProjectId,
     
 }

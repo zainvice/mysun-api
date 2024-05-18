@@ -17,7 +17,7 @@ const createTasks = async (projectData, workers, projectId) => {
   const SupervisorWorkers = workers.filter(worker => worker.role === 'supervisor');
   console.log("PROJECT DATA GO NOW", projectData)
 
-  if (projectData.tasks.length === 0 || nonSupervisorWorkers.length === 0) {
+  if (projectData.tasks.length === 0) {
     //console.log("No tasks to distribute or no non-supervisor workers.");
     return [];
   }
